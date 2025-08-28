@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦女治愈APP - 用户登录功能流程图</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0e5ff 0%, #d9c6e0 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #6A4C93;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        
+        .mermaid {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid #6A4C93;
+        }
+        
+        .legend h3 {
+            color: #6A4C93;
+            margin-top: 0;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .info-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 梦女治愈APP - 用户登录功能流程图 🌸</h1>
+        
+        <div class="info-box">
+            <h4>📱 当前实现状态</h4>
+            <p>✅ 验证码登录 | ✅ 密码登录 | ✅ 忘记密码 | ✅ 完整流程</p>
+            <p>🔑 测试验证码: 123456 | 📁 Flutter实现完成</p>
+        </div>
+
+        <div class="mermaid">
+            flowchart TD
+                %% 样式定义
+                classDef startEnd fill:#FF9A9E,stroke:#FF6B6B,stroke-width:2px,color:#fff,font-weight:bold
+                classDef mainFlow fill:#4ECDC4,stroke:#45B7AA,stroke-width:2px,color:#fff,font-weight:bold
+                classDef branchFlow fill:#FFE66D,stroke:#FFD93D,stroke-width:2px,color:#333,font-weight:bold
+                classDef forgotFlow fill:#FF6B6B,stroke:#FF5252,stroke-width:2px,color:#fff,font-weight:bold
+                classDef successFlow fill:#95E1D3,stroke:#81C784,stroke-width:2px,color:#333,font-weight:bold
+                
+                %% 主流程
+                A["应用启动"] --> B["登录页面"]
+                B --> C["验证码登录<br/>测试码: 123456"]
+                C --> D{"登录成功?"}
+                D -->|"是"| E["主页"]
+                
+                %% 分支流程
+                B --> F["密码登录"]
+                F --> D
+                
+                %% 忘记密码流程
+                F --> G{"忘记密码?"}
+                G -->|"是"| H["输入手机号"]
+                H --> I["验证码验证"]
+                I --> J["密码重置"]
+                J --> K["重置成功"]
+                K --> F
+                
+                %% 返回路径 - 简化为虚线
+                F -.->|"返回"| B
+                H -.->|"返回"| F
+                I -.->|"返回"| H
+                J -.->|"返回"| I
+                
+                %% 应用样式
+                class A,E startEnd
+                class B,C,D,G mainFlow
+                class F branchFlow
+                class H,I,J,K forgotFlow
+        </div>
+
+        <div class="legend">
+            <h3>📋 图例说明</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF9A9E;"></div>
+                <span><strong>开始/结束节点</strong> - 应用启动和成功跳转</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4ECDC4;"></div>
+                <span><strong>主流程</strong> - 验证码登录的主要路径</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFE66D;"></div>
+                <span><strong>分支流程</strong> - 密码登录相关页面</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF6B6B;"></div>
+                <span><strong>忘记密码流程</strong> - 密码重置相关页面</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #95E1D3;"></div>
+                <span><strong>成功状态</strong> - 操作成功的反馈</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: transparent; border: 2px dashed #999;"></div>
+                <span><strong>返回路径</strong> - 虚线表示返回操作</span>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>📁 文件结构</h3>
+            <p><strong>主要文件:</strong></p>
+            <ul>
+                <li><code>lib/main.dart</code> - 应用入口</li>
+                <li><code>lib/screens/login_screen.dart</code> - 验证码登录页面</li>
+                <li><code>lib/screens/password_login_screen.dart</code> - 密码登录页面</li>
+                <li><code>lib/screens/forgot_password_screen.dart</code> - 忘记密码页面</li>
+                <li><code>lib/screens/forgot_password_verify_screen.dart</code> - 验证码验证页面</li>
+                <li><code>lib/screens/forgot_password_reset_screen.dart</code> - 密码重置页面</li>
+                <li><code>lib/screens/homepage_screen.dart</code> - 主页</li>
+            </ul>
+        </div>
+
+        <div class="legend">
+            <h3>🧪 测试信息</h3>
+            <p><strong>测试验证码:</strong> <code>123456</code></p>
+            <p><strong>测试流程:</strong></p>
+            <ol>
+                <li>输入任意11位手机号</li>
+                <li>点击"获取验证码"</li>
+                <li>输入验证码 <code>123456</code></li>
+                <li>登录成功跳转主页</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                rankSpacing: 100,
+                nodeSpacing: 80,
+                rankDir: 'TD',
+                padding: 15
+            },
+            themeVariables: {
+                primaryColor: '#F0E5FF',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#6A4C93',
+                lineColor: '#6A4C93',
+                secondaryColor: '#F8F9FA',
+                tertiaryColor: '#D9C6E0',
+                background: '#ffffff',
+                mainBkg: '#F0E5FF',
+                secondBkg: '#D9C6E0',
+                edgeLabelBackground: '#ffffff'
+            }
+        });
+    </script>
+</body>
+</html> 
