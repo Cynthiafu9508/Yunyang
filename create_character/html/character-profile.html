@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>虚拟人物档案</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f0e5ff, #d9c6e0);
+            width: 100vw;
+            height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* iPhone 16 容器 */
+        .iphone-container {
+            width: 393px;
+            height: 852px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 50px;
+            padding: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #f0e5ff, #d9c6e0);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 状态栏 */
+        .status-bar {
+            height: 44px;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .time {
+            font-weight: bold;
+        }
+        
+        .battery-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .app-content {
+            height: calc(100% - 44px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #6a4c93;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(217, 198, 224, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar h1 {
+            font-size: 18px;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: #6a4c93;
+            font-size: 16px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .edit-button {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .profile-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+        
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+        }
+        
+        .ai-badge {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            color: #6a4c93;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            box-shadow: 0 3px 12px rgba(168, 237, 234, 0.4);
+            z-index: 2;
+        }
+        
+        .profile-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .field-group {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 6px 30px rgba(106, 76, 147, 0.08);
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .field-group:hover {
+            box-shadow: 0 8px 40px rgba(106, 76, 147, 0.12);
+        }
+        
+        .field-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6a4c93;
+        }
+        
+        .field-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .field-content {
+            position: relative;
+        }
+        
+        .field-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: #6a4c93;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+        }
+        
+        .field-input:read-only {
+            cursor: default;
+        }
+        
+        .field-input.editable {
+            background: rgba(240, 229, 255, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid rgba(106, 76, 147, 0.2);
+        }
+        
+        .field-input.editable:focus {
+            border-color: #6a4c93;
+            background: rgba(240, 229, 255, 0.8);
+        }
+        
+        /* 标签化展示样式 */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .tag {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .tag-delete {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .tag-delete:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 154, 158, 0.4);
+        }
+        
+        .tag.active {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            color: #6a4c93;
+        }
+        
+        /* 不同字段的标签颜色 */
+        .tag.profession {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+        }
+        
+        .tag.personality {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            color: #6a4c93;
+        }
+        
+        .tag.speaking {
+            background: linear-gradient(45deg, #ffecd2, #fcb69f);
+        }
+        
+        .tag-detail {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #6a4c93;
+            line-height: 1.4;
+            border: 1px solid rgba(106, 76, 147, 0.1);
+            display: none;
+        }
+        
+        .tag-detail.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 身份背景选择样式 */
+        .identity-selector {
+            background: rgba(240, 229, 255, 0.15);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(106, 76, 147, 0.1);
+            position: relative;
+        }
+        
+        .identity-selector::before {
+            content: '点击选择身份';
+            position: absolute;
+            top: -8px;
+            left: 12px;
+            background: rgba(240, 229, 255, 0.9);
+            color: #6a4c93;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .identity-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .identity-option {
+            background: rgba(255, 255, 255, 0.8);
+            color: #6a4c93;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(106, 76, 147, 0.2);
+            position: relative;
+        }
+        
+        .identity-option::before {
+            content: '+';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: rgba(106, 76, 147, 0.8);
+            color: white;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .identity-option:hover {
+            background: rgba(106, 76, 147, 0.1);
+            border-color: rgba(106, 76, 147, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .identity-option:hover::before {
+            opacity: 1;
+        }
+        
+        .identity-option.selected {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+            box-shadow: 0 3px 12px rgba(255, 154, 158, 0.4);
+        }
+        
+        .identity-option.selected::before {
+            content: '✓';
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff9a9e;
+            opacity: 1;
+        }
+        
+        .custom-identity {
+            background: rgba(106, 76, 147, 0.1);
+            color: #6a4c93;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px dashed rgba(106, 76, 147, 0.4);
+        }
+        
+        .custom-identity:hover {
+            background: rgba(106, 76, 147, 0.2);
+            border-color: rgba(106, 76, 147, 0.6);
+            transform: translateY(-1px);
+        }
+        
+        
+        .edit-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .field-group:hover .edit-icon {
+            display: flex;
+        }
+        
+        .save-button {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+            margin: 30px auto;
+            display: block;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .save-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 10px rgba(255, 154, 158, 0.3);
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 480px) {
+            .iphone-container {
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+            
+            .profile-content {
+                padding: 15px;
+            }
+            
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-container">
+        <div class="screen">
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="battery-info">
+                    <span>100%</span>
+                    <div style="width: 24px; height: 12px; border: 1px solid #000; border-radius: 2px; position: relative;">
+                        <div style="width: 20px; height: 8px; background: #000; border-radius: 1px; margin: 1px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="app-content">
+                <div class="navbar">
+                    <button class="back-button" onclick="goBack()">← 返回</button>
+                    <h1>虚拟人物档案</h1>
+                    <div></div>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-header">
+                        <div class="profile-avatar">👩</div>
+                    </div>
+                    
+                    <div class="profile-fields">
+                        <div class="field-group" style="position: relative;">
+                            <div class="ai-badge">🤖 AI智能生成</div>
+                            <div class="field-label">
+                                <span class="field-icon">💫</span>
+                                人物昵称
+                            </div>
+                            <div class="field-content">
+                                <input type="text" class="field-input" id="nickname" value="梦幻小仙女" readonly>
+                                <button class="edit-icon" onclick="editField('nickname')">✏️</button>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span class="field-icon">🎂</span>
+                                出生日期
+                            </div>
+                            <div class="field-content">
+                                <input type="date" class="field-input" id="birthday" value="1995-06-15" readonly>
+                                <button class="edit-icon" onclick="editField('birthday')">✏️</button>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span class="field-icon">🎭</span>
+                                身份背景
+                            </div>
+                            <div class="field-content">
+                                <div class="identity-selector">
+                                    <div class="identity-options">
+                                        <span class="identity-option" onclick="selectIdentity('总裁')">总裁</span>
+                                        <span class="identity-option" onclick="selectIdentity('医生')">医生</span>
+                                        <span class="identity-option" onclick="selectIdentity('艺术家')">艺术家</span>
+                                        <span class="identity-option" onclick="selectIdentity('特工')">特工</span>
+                                        <span class="identity-option" onclick="selectIdentity('教授')">教授</span>
+                                        <span class="identity-option" onclick="selectIdentity('明星')">明星</span>
+                                        <span class="custom-identity" onclick="addCustomIdentity()">+ 自定义</span>
+                                    </div>
+                                </div>
+                                <div class="tag-container" id="identity-tags">
+                                    <span class="tag profession selected-identity" onclick="showTagDetail('identity', '艺术家')">
+                                        艺术家
+                                        <button class="tag-delete" onclick="deleteTag(event, 'identity', '艺术家')">×</button>
+                                    </span>
+                                </div>
+                                <div class="tag-detail" id="identity-detail"></div>
+                                <button class="edit-icon" onclick="editField('identity')">✏️</button>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span class="field-icon">✨</span>
+                                性格特征
+                            </div>
+                            <div class="field-content">
+                                <div class="identity-selector">
+                                    <div class="identity-options">
+                                        <span class="identity-option" onclick="selectPersonality('温柔体贴')">温柔体贴</span>
+                                        <span class="identity-option" onclick="selectPersonality('霸道专一')">霸道专一</span>
+                                        <span class="identity-option" onclick="selectPersonality('浪漫多情')">浪漫多情</span>
+                                        <span class="identity-option" onclick="selectPersonality('成熟稳重')">成熟稳重</span>
+                                        <span class="identity-option" onclick="selectPersonality('阳光开朗')">阳光开朗</span>
+                                        <span class="identity-option" onclick="selectPersonality('神秘高冷')">神秘高冷</span>
+                                        <span class="custom-identity" onclick="addCustomPersonality()">+ 自定义</span>
+                                    </div>
+                                </div>
+                                <div class="tag-container" id="personality-tags">
+                                    <span class="tag personality selected-identity" onclick="showTagDetail('personality', '温柔体贴')">
+                                        温柔体贴
+                                        <button class="tag-delete" onclick="deleteTag(event, 'personality', '温柔体贴')">×</button>
+                                    </span>
+                                </div>
+                                <div class="tag-detail" id="personality-detail"></div>
+                                <button class="edit-icon" onclick="editField('personality')">✏️</button>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span class="field-icon">💬</span>
+                                说话风格
+                            </div>
+                            <div class="field-content">
+                                <div class="identity-selector">
+                                    <div class="identity-options">
+                                        <span class="identity-option" onclick="selectSpeaking('温柔宠溺')">温柔宠溺</span>
+                                        <span class="identity-option" onclick="selectSpeaking('霸道强势')">霸道强势</span>
+                                        <span class="identity-option" onclick="selectSpeaking('甜腻撒娇')">甜腻撒娇</span>
+                                        <span class="identity-option" onclick="selectSpeaking('成熟理性')">成熟理性</span>
+                                        <span class="identity-option" onclick="selectSpeaking('幽默风趣')">幽默风趣</span>
+                                        <span class="identity-option" onclick="selectSpeaking('神秘深沉')">神秘深沉</span>
+                                        <span class="custom-identity" onclick="addCustomSpeaking()">+ 自定义</span>
+                                    </div>
+                                </div>
+                                <div class="tag-container" id="speaking-tags">
+                                    <span class="tag speaking selected-identity" onclick="showTagDetail('speaking', '温柔宠溺')">
+                                        温柔宠溺
+                                        <button class="tag-delete" onclick="deleteTag(event, 'speaking', '温柔宠溺')">×</button>
+                                    </span>
+                                </div>
+                                <div class="tag-detail" id="speaking-detail"></div>
+                                <button class="edit-icon" onclick="editField('speaking')">✏️</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="save-button" onclick="createCharacter()">
+                        ✨ 创建人物
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 标签详情数据
+        const tagDetails = {
+            identity: {
+                '总裁': '商业帝国的掌舵者，拥有强大的领导力和决策能力，在商场上运筹帷幄，对心爱的人却温柔体贴。',
+                '医生': '救死扶伤的白衣天使，专业严谨又温柔细心，总是能在关键时刻给予最贴心的关怀和照顾。',
+                '艺术家': '充满浪漫情怀的创作者，有着独特的审美和丰富的想象力，用艺术表达内心最真挚的情感。',
+                '特工': '神秘而强大的守护者，身手敏捷、智慧过人，在危险中保护所爱之人，展现最man的一面。',
+                '教授': '博学多才的学者，温文尔雅、理性睿智，在学术领域有着深厚造诣，是理想的知性伴侣。',
+                '明星': '万众瞩目的偶像，才华横溢、魅力四射，在舞台上闪闪发光，私下却只对一个人温柔。'
+            },
+            personality: {
+                '温柔体贴': '性格温和如水，总是能察觉到你的情绪变化，给予最贴心的关怀和照顾，让人感到被深深爱着。',
+                '霸道专一': '在外人面前强势霸道，但对你却专一深情，占有欲强，只对你一个人温柔，让人感到被珍视。',
+                '浪漫多情': '充满浪漫情怀，善于制造惊喜，会用各种方式表达爱意，让生活充满甜蜜和浪漫。',
+                '成熟稳重': '性格沉稳内敛，做事深思熟虑，能给你安全感和依靠，是值得信赖的成熟男人。',
+                '阳光开朗': '性格积极乐观，总是充满正能量，能带给你快乐和活力，让生活变得阳光明媚。',
+                '神秘高冷': '外表高冷神秘，内心却温柔细腻，只对特别的人展现真实的一面，充满魅力。'
+            },
+            speaking: {
+                '温柔宠溺': '说话温柔如水，总是用宠溺的语气，经常说"宝贝"、"小傻瓜"等亲昵称呼，让人感到被深深宠爱。',
+                '霸道强势': '语气霸道强势，经常说"你是我的"、"不许"等占有性话语，但内心却充满保护欲。',
+                '甜腻撒娇': '说话甜腻可爱，经常撒娇卖萌，用"嘛"、"啦"等语气词，让人忍不住想要宠爱。',
+                '成熟理性': '说话成熟稳重，逻辑清晰，善于分析和解决问题，给人可靠和安心的感觉。',
+                '幽默风趣': '说话幽默风趣，经常开玩笑逗你开心，用轻松的方式化解尴尬，让人感到快乐。',
+                '神秘深沉': '说话简洁有力，语气深沉神秘，经常用暗示性的话语，让人想要深入了解。'
+            }
+        };
+        
+        // 显示标签详情
+        function showTagDetail(fieldType, tagName) {
+            const detailElement = document.getElementById(fieldType + '-detail');
+            const detailText = tagDetails[fieldType][tagName];
+            
+            // 隐藏其他详情
+            document.querySelectorAll('.tag-detail').forEach(detail => {
+                detail.classList.remove('show');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            
+            // 显示当前标签详情
+            if (detailText) {
+                detailElement.textContent = detailText;
+                detailElement.classList.add('show');
+                event.target.classList.add('active');
+            }
+        }
+        
+        // 删除标签
+        function deleteTag(event, fieldType, tagName) {
+            event.stopPropagation(); // 阻止触发父元素的点击事件
+            
+            if (confirm(`确定要删除标签"${tagName}"吗？`)) {
+                // 找到对应的标签元素并删除
+                const tagElement = event.target.parentElement;
+                tagElement.remove();
+                
+                // 隐藏对应的详情
+                const detailElement = document.getElementById(fieldType + '-detail');
+                if (detailElement.classList.contains('show')) {
+                    detailElement.classList.remove('show');
+                }
+                
+                // 从数据中删除
+                if (tagDetails[fieldType] && tagDetails[fieldType][tagName]) {
+                    delete tagDetails[fieldType][tagName];
+                }
+            }
+        }
+        
+        // 选择身份背景
+        function selectIdentity(identityName) {
+            // 更新选择状态
+            document.querySelectorAll('.identity-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // 检查是否已存在该标签
+            const existingTags = document.querySelectorAll('#identity-tags .tag');
+            let tagExists = false;
+            existingTags.forEach(tag => {
+                if (tag.textContent.includes(identityName)) {
+                    tagExists = true;
+                }
+            });
+            
+            // 如果不存在，添加新标签
+            if (!tagExists) {
+                addIdentityTag(identityName);
+            }
+        }
+        
+        // 添加身份标签
+        function addIdentityTag(identityName) {
+            const tagContainer = document.getElementById('identity-tags');
+            const newTag = document.createElement('span');
+            newTag.className = 'tag profession selected-identity';
+            newTag.onclick = () => showTagDetail('identity', identityName);
+            newTag.innerHTML = `
+                ${identityName}
+                <button class="tag-delete" onclick="deleteTag(event, 'identity', '${identityName}')">×</button>
+            `;
+            tagContainer.appendChild(newTag);
+            
+            // 添加到数据中
+            if (!tagDetails.identity[identityName]) {
+                tagDetails.identity[identityName] = `自定义身份：${identityName}，具有独特的个人特色和经历。`;
+            }
+        }
+        
+        // 添加自定义身份
+        function addCustomIdentity() {
+            const customName = prompt('请输入自定义身份名称：');
+            if (customName && customName.trim() !== '') {
+                const trimmedName = customName.trim();
+                
+                // 检查是否已存在
+                const existingTags = document.querySelectorAll('#identity-tags .tag');
+                let tagExists = false;
+                existingTags.forEach(tag => {
+                    if (tag.textContent.includes(trimmedName)) {
+                        tagExists = true;
+                    }
+                });
+                
+                if (!tagExists) {
+                    addIdentityTag(trimmedName);
+                } else {
+                    alert('该身份标签已存在！');
+                }
+            }
+        }
+        
+        // 选择性格特征
+        function selectPersonality(personalityName) {
+            // 更新选择状态
+            document.querySelectorAll('.field-group:nth-child(3) .identity-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // 检查是否已存在该标签
+            const existingTags = document.querySelectorAll('#personality-tags .tag');
+            let tagExists = false;
+            existingTags.forEach(tag => {
+                if (tag.textContent.includes(personalityName)) {
+                    tagExists = true;
+                }
+            });
+            
+            // 如果不存在，添加新标签
+            if (!tagExists) {
+                addPersonalityTag(personalityName);
+            }
+        }
+        
+        // 添加性格标签
+        function addPersonalityTag(personalityName) {
+            const tagContainer = document.getElementById('personality-tags');
+            const newTag = document.createElement('span');
+            newTag.className = 'tag personality selected-identity';
+            newTag.onclick = () => showTagDetail('personality', personalityName);
+            newTag.innerHTML = `
+                ${personalityName}
+                <button class="tag-delete" onclick="deleteTag(event, 'personality', '${personalityName}')">×</button>
+            `;
+            tagContainer.appendChild(newTag);
+            
+            // 添加到数据中
+            if (!tagDetails.personality[personalityName]) {
+                tagDetails.personality[personalityName] = `自定义性格：${personalityName}，具有独特的个性魅力。`;
+            }
+        }
+        
+        // 添加自定义性格
+        function addCustomPersonality() {
+            const customName = prompt('请输入自定义性格特征：');
+            if (customName && customName.trim() !== '') {
+                const trimmedName = customName.trim();
+                
+                // 检查是否已存在
+                const existingTags = document.querySelectorAll('#personality-tags .tag');
+                let tagExists = false;
+                existingTags.forEach(tag => {
+                    if (tag.textContent.includes(trimmedName)) {
+                        tagExists = true;
+                    }
+                });
+                
+                if (!tagExists) {
+                    addPersonalityTag(trimmedName);
+                } else {
+                    alert('该性格标签已存在！');
+                }
+            }
+        }
+        
+        // 选择说话风格
+        function selectSpeaking(speakingName) {
+            // 更新选择状态
+            document.querySelectorAll('.field-group:nth-child(4) .identity-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // 检查是否已存在该标签
+            const existingTags = document.querySelectorAll('#speaking-tags .tag');
+            let tagExists = false;
+            existingTags.forEach(tag => {
+                if (tag.textContent.includes(speakingName)) {
+                    tagExists = true;
+                }
+            });
+            
+            // 如果不存在，添加新标签
+            if (!tagExists) {
+                addSpeakingTag(speakingName);
+            }
+        }
+        
+        // 添加说话风格标签
+        function addSpeakingTag(speakingName) {
+            const tagContainer = document.getElementById('speaking-tags');
+            const newTag = document.createElement('span');
+            newTag.className = 'tag speaking selected-identity';
+            newTag.onclick = () => showTagDetail('speaking', speakingName);
+            newTag.innerHTML = `
+                ${speakingName}
+                <button class="tag-delete" onclick="deleteTag(event, 'speaking', '${speakingName}')">×</button>
+            `;
+            tagContainer.appendChild(newTag);
+            
+            // 添加到数据中
+            if (!tagDetails.speaking[speakingName]) {
+                tagDetails.speaking[speakingName] = `自定义说话风格：${speakingName}，具有独特的表达方式。`;
+            }
+        }
+        
+        // 添加自定义说话风格
+        function addCustomSpeaking() {
+            const customName = prompt('请输入自定义说话风格：');
+            if (customName && customName.trim() !== '') {
+                const trimmedName = customName.trim();
+                
+                // 检查是否已存在
+                const existingTags = document.querySelectorAll('#speaking-tags .tag');
+                let tagExists = false;
+                existingTags.forEach(tag => {
+                    if (tag.textContent.includes(trimmedName)) {
+                        tagExists = true;
+                    }
+                });
+                
+                if (!tagExists) {
+                    addSpeakingTag(trimmedName);
+                } else {
+                    alert('该说话风格标签已存在！');
+                }
+            }
+        }
+        
+        function editField(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.readOnly = false;
+                field.classList.add('editable');
+                field.focus();
+                field.select();
+            }
+        }
+        
+        // 获取来源页面参数
+        function getSourcePage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('from') || 'homepage'; // 默认返回聊天页面
+        }
+        
+        function goBack() {
+            // 返回到上传页面
+            const sourcePage = getSourcePage();
+            window.location.href = `upload.html?from=${sourcePage}`;
+        }
+        
+        function createCharacter() {
+            // 根据来源页面跳转到不同页面
+            const sourcePage = getSourcePage();
+            alert('虚拟人物创建成功！');
+            
+            if (sourcePage === 'contacts') {
+                window.location.href = 'contacts.html';
+            } else {
+                window.location.href = 'homepage.html'; // 默认返回聊天页面
+            }
+        }
+    </script>
+</body>
+</html>
