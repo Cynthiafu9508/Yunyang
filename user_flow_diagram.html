@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云养APP - 用户功能流程图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .flow-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .section-number {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .flow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .arrow-down {
+            text-align: center;
+            color: #667eea;
+            font-size: 30px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>云养APP - 用户功能流程图</h1>
+        <p class="subtitle">梦女治愈系虚拟人物陪伴应用</p>
+
+        <!-- 01 登录 -->
+        <div class="flow-section">
+            <div class="section-number">01</div>
+            <h2 class="section-title">登录/注册</h2>
+            <div class="flow-steps">
+                <div class="step-card">
+                    <div class="step-icon">📱</div>
+                    <div class="step-title">手机号登录</div>
+                    <div class="step-desc">验证码登录，快速注册</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">🔑</div>
+                    <div class="step-title">密码登录</div>
+                    <div class="step-desc">已注册用户密码登录</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">🔄</div>
+                    <div class="step-title">忘记密码</div>
+                    <div class="step-desc">通过验证码重置密码</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- 02 聊天首页 -->
+        <div class="flow-section">
+            <div class="section-number">02</div>
+            <h2 class="section-title">聊天首页</h2>
+            <div class="flow-steps">
+                <div class="step-card">
+                    <div class="step-icon">💬</div>
+                    <div class="step-title">聊天列表</div>
+                    <div class="step-desc">查看所有虚拟人物聊天</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">🔍</div>
+                    <div class="step-title">搜索功能</div>
+                    <div class="step-desc">搜索聊天和联系人</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- 03 联系人 -->
+        <div class="flow-section">
+            <div class="section-number">03</div>
+            <h2 class="section-title">联系人</h2>
+            <div class="flow-steps">
+                <div class="step-card">
+                    <div class="step-icon">📇</div>
+                    <div class="step-title">字母分组</div>
+                    <div class="step-desc">A-Z分组展示人物</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">👤</div>
+                    <div class="step-title">人物管理</div>
+                    <div class="step-desc">查看所有虚拟人物</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- 04 创建人物 -->
+        <div class="flow-section">
+            <div class="section-number">04</div>
+            <h2 class="section-title">创建虚拟人物</h2>
+            <div class="flow-steps">
+                <div class="step-card">
+                    <div class="step-icon">📸</div>
+                    <div class="step-title">上传照片</div>
+                    <div class="step-desc">拍照或选择照片</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">🤖</div>
+                    <div class="step-title">AI生成档案</div>
+                    <div class="step-desc">智能生成人物信息</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">✏️</div>
+                    <div class="step-title">自定义编辑</div>
+                    <div class="step-desc">编辑人物各项属性</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- 05 聊天互动 -->
+        <div class="flow-section">
+            <div class="section-number">05</div>
+            <h2 class="section-title">聊天互动</h2>
+            <div class="flow-steps">
+                <div class="step-card">
+                    <div class="step-icon">💭</div>
+                    <div class="step-title">对话交流</div>
+                    <div class="step-desc">与虚拟人物自然对话</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">🎭</div>
+                    <div class="step-title">角色扮演</div>
+                    <div class="step-desc">基于档案的性格表现</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- 06 个人中心 -->
+        <div class="flow-section">
+            <div class="section-number">06</div>
+            <h2 class="section-title">个人中心</h2>
+            <div class="flow-steps">
+                <div class="step-card">
+                    <div class="step-icon">👤</div>
+                    <div class="step-title">个人信息</div>
+                    <div class="step-desc">管理头像和昵称</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">⚙️</div>
+                    <div class="step-title">账户设置</div>
+                    <div class="step-desc">隐私和通知管理</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
