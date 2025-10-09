@@ -22,6 +22,7 @@
             margin: 0 auto;
             background: white;
             border: 2px solid #333;
+            position: relative;
         }
 
         .title {
@@ -36,7 +37,7 @@
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            min-height: 2000px;
+            position: relative;
         }
 
         .left-section,
@@ -82,6 +83,7 @@
             width: fit-content;
             min-width: 150px;
             max-width: 250px;
+            position: relative;
         }
 
         .flow-decision {
@@ -138,10 +140,12 @@
             font-size: 12px;
             color: #666;
             margin: 5px 0;
+            text-align: center;
         }
 
         .flow-group {
             margin-bottom: 30px;
+            position: relative;
         }
 
         .horizontal-flow {
@@ -158,6 +162,60 @@
             text-align: center;
             margin: 10px 0;
             font-style: italic;
+        }
+
+        /* 连接线样式 */
+        .connection {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            width: 60px;
+            height: 2px;
+            background: #333;
+            z-index: 10;
+        }
+
+        .connection::after {
+            content: '→';
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .connection-label {
+            position: absolute;
+            top: -25px;
+            left: 5px;
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            background: white;
+            padding: 2px 5px;
+        }
+
+        .connection-reverse {
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            width: 60px;
+            height: 2px;
+            background: #333;
+            z-index: 10;
+        }
+
+        .connection-reverse::before {
+            content: '←';
+            position: absolute;
+            left: -10px;
+            top: -10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .with-connection {
+            position: relative;
         }
 
         @media print {
@@ -189,9 +247,21 @@
                 <div class="note">手机号验证码登录<br>密码登录<br>忘记密码</div>
                 <div class="arrow">↓</div>
                 
-                <div class="flow-box">输入登录信息</div>
+                <div class="flow-box with-connection">
+                    输入登录信息
+                    <div class="connection">
+                        <div class="connection-label">发送登录请求</div>
+                    </div>
+                </div>
                 <div class="arrow">↓</div>
-                <div class="arrow-text">验证通过</div>
+                
+                <div class="flow-box with-connection">
+                    验证通过，进入首页
+                    <div class="connection-reverse" style="top: 50%;">
+                        <div class="connection-label" style="right: 5px; left: auto;">返回Token和数据</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
                 
                 <!-- 02 聊天首页 -->
                 <div class="flow-box">进入聊天首页</div>
@@ -203,23 +273,34 @@
                 
                 <div class="horizontal-flow">
                     <div style="flex: 1;">
-                        <div class="flow-box" style="background: #fff3cd;">查看联系人</div>
-                        <div class="arrow">↓</div>
+                        <div class="flow-box" style="background: #fff3cd; font-size: 13px;">联系人</div>
                     </div>
                     <div style="flex: 1;">
-                        <div class="flow-box" style="background: #fff3cd;">创建新人物</div>
-                        <div class="arrow">↓</div>
+                        <div class="flow-box" style="background: #fff3cd; font-size: 13px;">创建人物</div>
                     </div>
                     <div style="flex: 1;">
-                        <div class="flow-box" style="background: #fff3cd;">进入聊天</div>
-                        <div class="arrow">↓</div>
+                        <div class="flow-box" style="background: #fff3cd; font-size: 13px;">聊天</div>
                     </div>
                 </div>
+                <div class="arrow">↓</div>
                 
                 <!-- 03 联系人列表 -->
                 <div class="flow-group">
-                    <div class="flow-box">联系人列表页</div>
-                    <div class="note">按字母A-Z分组<br>快速索引定位</div>
+                    <div class="flow-box with-connection">
+                        进入联系人列表
+                        <div class="connection">
+                            <div class="connection-label">请求联系人数据</div>
+                        </div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box with-connection">
+                        显示A-Z分组列表
+                        <div class="connection-reverse">
+                            <div class="connection-label" style="right: 5px; left: auto;">返回分组数据</div>
+                        </div>
+                    </div>
+                    <div class="note">快速索引定位</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-box">点击虚拟人物</div>
@@ -228,11 +309,24 @@
                 
                 <!-- 04 创建人物 -->
                 <div class="flow-group">
-                    <div class="flow-box">上传人物照片</div>
+                    <div class="flow-box">点击创建新人物</div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box with-connection">
+                        上传人物照片
+                        <div class="connection">
+                            <div class="connection-label">上传照片文件</div>
+                        </div>
+                    </div>
                     <div class="note">拍照或相册选择</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">查看AI生成档案</div>
+                    <div class="flow-box with-connection">
+                        显示AI生成档案
+                        <div class="connection-reverse">
+                            <div class="connection-label" style="right: 5px; left: auto;">返回生成内容</div>
+                        </div>
+                    </div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-process">
@@ -252,7 +346,24 @@
                     <div class="note">可单独编辑每个字段</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">点击"创建人物"</div>
+                    <div class="flow-box with-connection">
+                        点击"创建人物"
+                        <div class="connection">
+                            <div class="connection-label">提交人物数据</div>
+                        </div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box with-connection">
+                        创建成功提示
+                        <div class="connection-reverse">
+                            <div class="connection-label" style="right: 5px; left: auto;">返回创建结果</div>
+                        </div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box">返回聊天首页</div>
+                    <div class="note">新人物出现在列表中</div>
                     <div class="arrow">↓</div>
                 </div>
                 
@@ -261,10 +372,23 @@
                     <div class="flow-box">进入聊天详情页</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">发送消息</div>
+                    <div class="flow-box with-connection">
+                        发送消息
+                        <div class="connection">
+                            <div class="connection-label">发送消息内容</div>
+                        </div>
+                    </div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">接收AI回复</div>
+                    <div class="flow-box">等待回复</div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box with-connection">
+                        接收AI回复
+                        <div class="connection-reverse">
+                            <div class="connection-label" style="right: 5px; left: auto;">推送AI回复</div>
+                        </div>
+                    </div>
                     <div class="note">基于人物档案的<br>个性化回复</div>
                     <div class="arrow">↓</div>
                     
@@ -275,7 +399,7 @@
                 
                 <!-- 06 个人中心 -->
                 <div class="flow-group">
-                    <div class="flow-box">个人中心页面</div>
+                    <div class="flow-box">进入个人中心</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-process">
@@ -291,7 +415,20 @@
                     </div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">选择功能操作</div>
+                    <div class="flow-box with-connection">
+                        选择功能操作
+                        <div class="connection">
+                            <div class="connection-label">发送更新请求</div>
+                        </div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box with-connection">
+                        操作成功提示
+                        <div class="connection-reverse">
+                            <div class="connection-label" style="right: 5px; left: auto;">返回操作结果</div>
+                        </div>
+                    </div>
                     <div class="arrow">↓</div>
                 </div>
                 
@@ -312,14 +449,15 @@
             <div class="right-section">
                 <div class="section-title">后台</div>
                 
-                <div style="height: 60px;"></div>
+                <div style="height: 140px;"></div>
                 
                 <!-- 登录验证 -->
                 <div class="flow-group">
-                    <div style="height: 80px;"></div>
+                    <div class="flow-box">接收登录请求</div>
+                    <div class="arrow">↓</div>
                     
                     <div class="flow-decision">
-                        <div class="flow-decision-text">验证登录信息</div>
+                        <div class="flow-decision-text">验证登录<br>信息</div>
                     </div>
                     <div class="arrow">↓</div>
                     <div class="arrow-text">验证成功</div>
@@ -330,42 +468,45 @@
                     <div class="flow-box">加载用户数据</div>
                     <div class="note">聊天列表<br>虚拟人物列表</div>
                     <div class="arrow">↓</div>
-                </div>
-                
-                <!-- 数据加载 -->
-                <div class="flow-group">
-                    <div style="height: 60px;"></div>
                     
-                    <div class="flow-box">返回用户数据</div>
+                    <div class="flow-box">返回数据到客户端</div>
                     <div class="arrow">↓</div>
                 </div>
                 
-                <div style="height: 120px;"></div>
+                <div style="height: 160px;"></div>
                 
                 <!-- 联系人数据 -->
                 <div class="flow-group">
-                    <div class="flow-box">查询联系人列表</div>
+                    <div class="flow-box">接收联系人请求</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">按字母排序</div>
+                    <div class="flow-box">查询用户所有人物</div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box">按字母A-Z排序</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-box">返回联系人数据</div>
                     <div class="arrow">↓</div>
                 </div>
                 
+                <div style="height: 100px;"></div>
+                
                 <!-- 创建人物 - AI处理 -->
                 <div class="flow-group">
                     <div class="flow-box">接收照片文件</div>
                     <div class="arrow">↓</div>
                     
+                    <div class="flow-box">存储照片到服务器</div>
+                    <div class="arrow">↓</div>
+                    
                     <div class="flow-decision">
-                        <div class="flow-decision-text">人脸识别成功？</div>
+                        <div class="flow-decision-text">人脸识别<br>成功？</div>
                     </div>
                     <div class="arrow">↓</div>
                     <div class="arrow-text">Yes，识别成功</div>
                     
-                    <div class="flow-box">调用AI生成服务</div>
+                    <div class="flow-box">调用DeepSeek API</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-process">
@@ -384,13 +525,16 @@
                     <div class="flow-box">返回生成结果</div>
                     <div class="arrow">↓</div>
                     
-                    <div style="height: 80px;"></div>
+                    <div style="height: 180px;"></div>
                     
-                    <div class="flow-box">保存人物信息</div>
+                    <div class="flow-box">接收完整人物数据</div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box">保存到数据库</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-decision">
-                        <div class="flow-decision-text">保存成功？</div>
+                        <div class="flow-decision-text">保存<br>成功？</div>
                     </div>
                     <div class="arrow">↓</div>
                     <div class="arrow-text">Yes</div>
@@ -400,22 +544,30 @@
                     
                     <div class="flow-box">同步到联系人列表</div>
                     <div class="arrow">↓</div>
+                    
+                    <div class="flow-box">返回创建成功</div>
+                    <div class="arrow">↓</div>
                 </div>
+                
+                <div style="height: 60px;"></div>
                 
                 <!-- 聊天处理 -->
                 <div class="flow-group">
                     <div class="flow-box">接收用户消息</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">保存聊天记录</div>
+                    <div class="flow-box">保存消息到数据库</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-box">读取人物档案</div>
                     <div class="note">性格、兴趣、说话风格</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">调用AI对话服务</div>
-                    <div class="note">DeepSeek / GPT</div>
+                    <div class="flow-box">读取聊天历史</div>
+                    <div class="arrow">↓</div>
+                    
+                    <div class="flow-box">调用DeepSeek API</div>
+                    <div class="note">基于人物档案生成提示词</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-box">生成个性化回复</div>
@@ -424,31 +576,31 @@
                     <div class="flow-box">保存AI回复</div>
                     <div class="arrow">↓</div>
                     
-                    <div class="flow-box">推送消息到客户端</div>
+                    <div class="flow-box">推送到客户端</div>
                     <div class="arrow">↓</div>
                 </div>
                 
+                <div style="height: 80px;"></div>
+                
                 <!-- 用户信息更新 -->
                 <div class="flow-group">
-                    <div style="height: 80px;"></div>
-                    
                     <div class="flow-box">接收更新请求</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-decision">
-                        <div class="flow-decision-text">验证权限</div>
+                        <div class="flow-decision-text">验证<br>用户权限</div>
                     </div>
                     <div class="arrow">↓</div>
                     <div class="arrow-text">验证通过</div>
                     
-                    <div class="flow-box">更新用户信息</div>
+                    <div class="flow-box">更新数据库</div>
                     <div class="arrow">↓</div>
                     
                     <div class="flow-box">返回更新结果</div>
                     <div class="arrow">↓</div>
                 </div>
                 
-                <div style="height: 100px;"></div>
+                <div style="height: 80px;"></div>
                 
                 <div class="flow-process" style="background: #f8d7da;">
                     <div class="flow-process-title">数据持久化</div>
@@ -456,7 +608,7 @@
                         • 用户信息存储<br>
                         • 聊天记录存储<br>
                         • 人物档案存储<br>
-                        • 会话状态管理
+                        • Token会话管理
                     </div>
                 </div>
             </div>
