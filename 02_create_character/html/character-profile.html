@@ -617,6 +617,35 @@
                                 <button class="edit-icon" onclick="editField('speaking')">✏️</button>
                             </div>
                         </div>
+                        
+                        
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span class="field-icon">💕</span>
+                                初始关系
+                            </div>
+                            <div class="field-content">
+                                <div class="identity-selector">
+                                    <div class="identity-options">
+                                        <span class="identity-option" onclick="selectRelation('青梅竹马')">青梅竹马</span>
+                                        <span class="identity-option" onclick="selectRelation('暧昧好友')">暧昧好友</span>
+                                        <span class="identity-option" onclick="selectRelation('久别重逢')">久别重逢</span>
+                                        <span class="identity-option" onclick="selectRelation('陌生人')">陌生人</span>
+                                        <span class="identity-option" onclick="selectRelation('恋人')">恋人</span>
+                                        <span class="identity-option" onclick="selectRelation('同事')">同事</span>
+                                        <span class="custom-identity" onclick="addCustomRelation()">+ 自定义</span>
+                                    </div>
+                                </div>
+                                <div class="tag-container" id="relation-tags">
+                                    <span class="tag relation selected-identity" onclick="showTagDetail('relation', '暧昧好友')">
+                                        暧昧好友
+                                        <button class="tag-delete" onclick="deleteTag(event, 'relation', '暧昧好友')">×</button>
+                                    </span>
+                                </div>
+                                <div class="tag-detail" id="relation-detail"></div>
+                                <button class="edit-icon" onclick="editField('relation')">✏️</button>
+                            </div>
+                        </div>
                     </div>
                     
                     <button class="save-button" onclick="createCharacter()">
@@ -653,6 +682,14 @@
                 '成熟理性': '说话成熟稳重，逻辑清晰，善于分析和解决问题，给人可靠和安心的感觉。',
                 '幽默风趣': '说话幽默风趣，经常开玩笑逗你开心，用轻松的方式化解尴尬，让人感到快乐。',
                 '神秘深沉': '说话简洁有力，语气深沉神秘，经常用暗示性的话语，让人想要深入了解。'
+            },
+            relation: {
+                '青梅竹马': '从小一起长大的玩伴，彼此了解对方的一切，有着深厚的情感基础，自然亲密无间。',
+                '暧昧好友': '关系介于朋友和恋人之间，互相有好感却未明说，每次互动都带着若有似无的甜蜜和心动。',
+                '久别重逢': '曾经很亲密但失去联系多年，重新相遇后涌起复杂的情感，既熟悉又陌生，充满悸动。',
+                '陌生人': '初次相识的两个人，从陌生开始慢慢了解，充满新鲜感和探索的乐趣。',
+                '恋人': '正式确立恋爱关系的情侣，可以自然地表达爱意，享受甜蜜的恋爱时光。',
+                '同事': '工作中的搭档关系，日常相处中逐渐产生情愫，办公室恋情的微妙氛围。'
             }
         };
         
@@ -889,6 +926,73 @@
                     addSpeakingTag(trimmedName);
                 } else {
                     alert('该说话风格标签已存在！');
+                }
+            }
+        }
+        
+        // 选择初始关系
+        function selectRelation(relationName) {
+            // 更新选择状态
+            document.querySelectorAll('.field-group:nth-child(5) .identity-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // 检查是否已存在该标签
+            const existingTags = document.querySelectorAll('#relation-tags .tag');
+            let tagExists = false;
+            existingTags.forEach(tag => {
+                if (tag.textContent.includes(relationName)) {
+                    tagExists = true;
+                }
+            });
+            
+            // 如果不存在，添加新标签
+            if (!tagExists) {
+                addRelationTag(relationName);
+            }
+        }
+        
+        // 添加初始关系标签
+        function addRelationTag(relationName) {
+            const tagContainer = document.getElementById('relation-tags');
+            const newTag = document.createElement('span');
+            newTag.className = 'tag relation selected-identity';
+            newTag.onclick = () => showTagDetail('relation', relationName);
+            newTag.innerHTML = `
+                ${relationName}
+                <button class="tag-delete" onclick="deleteTag(event, 'relation', '${relationName}')">×</button>
+            `;
+            tagContainer.appendChild(newTag);
+            
+            // 添加到数据中
+            if (!tagDetails.relation) {
+                tagDetails.relation = {};
+            }
+            if (!tagDetails.relation[relationName]) {
+                tagDetails.relation[relationName] = `初始关系设定：${relationName}，这将影响你们之间的互动氛围和对话风格。`;
+            }
+        }
+        
+        // 添加自定义初始关系
+        function addCustomRelation() {
+            const customName = prompt('请输入自定义初始关系：');
+            if (customName && customName.trim() !== '') {
+                const trimmedName = customName.trim();
+                
+                // 检查是否已存在
+                const existingTags = document.querySelectorAll('#relation-tags .tag');
+                let tagExists = false;
+                existingTags.forEach(tag => {
+                    if (tag.textContent.includes(trimmedName)) {
+                        tagExists = true;
+                    }
+                });
+                
+                if (!tagExists) {
+                    addRelationTag(trimmedName);
+                } else {
+                    alert('该初始关系标签已存在！');
                 }
             }
         }
