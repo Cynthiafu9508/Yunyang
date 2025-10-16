@@ -100,6 +100,12 @@
             color: white;
             margin-right: 12px;
             box-shadow: 0 2px 8px rgba(255, 154, 158, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-avatar:active {
+            transform: scale(0.95);
         }
         
         .chat-info {
@@ -118,13 +124,42 @@
             color: #a991b8;
         }
         
-        .more-button {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: #6a4c93;
+        .heart-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .heart-icon {
+            font-size: 24px;
+            color: #ff6b9d;
+            animation: heartbeat 1.2s ease-in-out infinite;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+        }
+        
+        .heart-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6a4c93;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            14% {
+                transform: scale(1.2);
+            }
+            28% {
+                transform: scale(1);
+            }
+            42% {
+                transform: scale(1.2);
+            }
+            56% {
+                transform: scale(1);
+            }
         }
         
         /* 聊天消息区域 */
@@ -244,15 +279,6 @@
             color: #a991b8;
         }
         
-        .emoji-button {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            margin-right: 8px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
         .send-button {
             width: 36px;
             height: 36px;
@@ -354,12 +380,15 @@
             
             <div class="chat-header">
                 <button class="back-button" onclick="goBack()">← 返回</button>
-                <div class="chat-avatar">A</div>
+                <div class="chat-avatar" onclick="viewCharacterProfile()" style="cursor: pointer;">A</div>
                 <div class="chat-info">
                     <div class="chat-name">小仙女Alice</div>
                     <div class="chat-status" id="chatStatus">在线</div>
                 </div>
-                <button class="more-button" onclick="showMore()">⋯</button>
+                <div class="heart-container">
+                    <div class="heart-icon" onclick="showHeartInfo()">❤️</div>
+                    <div class="heart-count" id="heartCount">0</div>
+                </div>
             </div>
             
             <div class="typing-indicator" id="typingIndicator">
@@ -425,7 +454,6 @@
             
             <div class="chat-input">
                 <div class="input-container">
-                    <button class="emoji-button" onclick="showEmoji()">😊</button>
                     <textarea class="message-input" id="messageInput" placeholder="输入消息..." rows="1" oninput="adjustTextarea(this)" onkeydown="handleKeyDown(event)"></textarea>
                 </div>
                 <button class="send-button" id="sendButton" onclick="sendMessage()" disabled>
@@ -442,6 +470,70 @@
         const chatMessages = document.getElementById('chatMessages');
         const typingIndicator = document.getElementById('typingIndicator');
         const chatStatus = document.getElementById('chatStatus');
+        const heartCountElement = document.getElementById('heartCount');
+        
+        // 检查每日心跳值是否过期（24点清零）
+        function checkDailyHeartExpire() {
+            const lastSignInDate = localStorage.getItem('lastSignInDate');
+            const today = new Date().toDateString();
+            
+            if (lastSignInDate !== today) {
+                // 新的一天，清零每日心跳值
+                localStorage.setItem('dailyHeartBalance', '0');
+            }
+        }
+        
+        // 初始化心跳值（从localStorage读取，如果没有则设置默认值）
+        function initHeartBalance() {
+            checkDailyHeartExpire();
+            
+            let balance = localStorage.getItem('heartBalance');
+            if (!balance) {
+                balance = 2350; // 默认心跳值
+                localStorage.setItem('heartBalance', balance);
+            }
+            
+            let dailyBalance = localStorage.getItem('dailyHeartBalance');
+            if (!dailyBalance) {
+                dailyBalance = 0;
+                localStorage.setItem('dailyHeartBalance', dailyBalance);
+            }
+            
+            updateHeartDisplay();
+        }
+        
+        // 更新心跳值显示（显示总心跳值）
+        function updateHeartDisplay() {
+            const balance = parseInt(localStorage.getItem('heartBalance')) || 0;
+            const dailyBalance = parseInt(localStorage.getItem('dailyHeartBalance')) || 0;
+            const totalBalance = balance + dailyBalance;
+            heartCountElement.textContent = totalBalance.toLocaleString();
+        }
+        
+        // 消耗心跳值（优先消耗每日赠送）
+        function consumeHeart(amount = 1) {
+            let dailyBalance = parseInt(localStorage.getItem('dailyHeartBalance')) || 0;
+            let balance = parseInt(localStorage.getItem('heartBalance')) || 0;
+            
+            // 优先消耗每日赠送心跳值
+            if (dailyBalance >= amount) {
+                dailyBalance -= amount;
+                localStorage.setItem('dailyHeartBalance', dailyBalance);
+                updateHeartDisplay();
+                return true;
+            } else if (dailyBalance + balance >= amount) {
+                // 每日心跳值不足，使用普通心跳值补足
+                const remaining = amount - dailyBalance;
+                balance -= remaining;
+                dailyBalance = 0;
+                localStorage.setItem('dailyHeartBalance', '0');
+                localStorage.setItem('heartBalance', balance);
+                updateHeartDisplay();
+                return true;
+            }
+            
+            return false;
+        }
         
         // 监听输入变化
         messageInput.addEventListener('input', function() {
@@ -473,6 +565,14 @@
         function sendMessage() {
             const message = messageInput.value.trim();
             if (!message) return;
+            
+            // 检查心跳值是否足够
+            if (!consumeHeart(1)) {
+                if (confirm('心跳值不足，无法发送消息。\n\n是否前往充值？')) {
+                    window.location.href = 'recharge.html';
+                }
+                return;
+            }
             
             // 添加用户消息
             addMessage(message, 'sent');
@@ -567,25 +667,35 @@
             window.location.href = 'homepage.html';
         }
         
-        // 更多操作
-        function showMore() {
-            alert('更多功能：\n• 查看资料\n• 清空聊天记录\n• 屏蔽消息\n• 举报\n\n(功能开发中...)');
+        // 查看人物档案
+        function viewCharacterProfile() {
+            // 获取当前聊天的人物ID（从URL参数或默认）
+            const urlParams = new URLSearchParams(window.location.search);
+            const characterId = urlParams.get('character') || 'alice_001';
+            window.location.href = `character-profile.html?id=${characterId}&mode=view`;
         }
         
-        // 表情按钮
-        function showEmoji() {
-            const emojis = ['😊', '😂', '❤️', '👍', '🎉', '😘', '🥰', '😍', '🤗', '😇'];
-            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-            messageInput.value += emoji;
-            messageInput.focus();
+        // 心跳信息
+        function showHeartInfo() {
+            const balance = parseInt(localStorage.getItem('heartBalance')) || 0;
+            const dailyBalance = parseInt(localStorage.getItem('dailyHeartBalance')) || 0;
+            const totalBalance = balance + dailyBalance;
             
-            // 触发input事件
-            const event = new Event('input');
-            messageInput.dispatchEvent(event);
+            let message = `💖 心跳值详情\n\n`;
+            message += `总计：${totalBalance.toLocaleString()} 个心跳值\n\n`;
+            message += `• 永久心跳值：${balance.toLocaleString()}\n`;
+            message += `• 今日赠送：${dailyBalance.toLocaleString()}（24点清零）\n\n`;
+            message += `每次发送消息消耗1点心跳值\n优先消耗今日赠送心跳值\n\n`;
+            message += `是否前往充值？`;
+            
+            if (confirm(message)) {
+                window.location.href = 'recharge.html';
+            }
         }
         
         // 页面加载完成后滚动到底部
         window.addEventListener('load', function() {
+            initHeartBalance(); // 初始化心跳值
             scrollToBottom();
             messageInput.focus();
         });

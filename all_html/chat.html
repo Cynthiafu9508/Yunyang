@@ -100,6 +100,12 @@
             color: white;
             margin-right: 12px;
             box-shadow: 0 2px 8px rgba(255, 154, 158, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-avatar:active {
+            transform: scale(0.95);
         }
         
         .chat-info {
@@ -374,7 +380,7 @@
             
             <div class="chat-header">
                 <button class="back-button" onclick="goBack()">← 返回</button>
-                <div class="chat-avatar">A</div>
+                <div class="chat-avatar" onclick="viewCharacterProfile()" style="cursor: pointer;">A</div>
                 <div class="chat-info">
                     <div class="chat-name">小仙女Alice</div>
                     <div class="chat-status" id="chatStatus">在线</div>
@@ -659,6 +665,14 @@
         // 返回按钮
         function goBack() {
             window.location.href = 'homepage.html';
+        }
+        
+        // 查看人物档案
+        function viewCharacterProfile() {
+            // 获取当前聊天的人物ID（从URL参数或默认）
+            const urlParams = new URLSearchParams(window.location.search);
+            const characterId = urlParams.get('character') || 'alice_001';
+            window.location.href = `character-profile.html?id=${characterId}&mode=view`;
         }
         
         // 心跳信息
