@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>充值中心</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f0e5ff, #d9c6e0);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* iPhone 16 容器 */
+        .iphone-container {
+            width: 393px;
+            height: 852px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 50px;
+            padding: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #f0e5ff, #d9c6e0);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 状态栏 */
+        .status-bar {
+            height: 44px;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .time {
+            font-weight: bold;
+        }
+        
+        .battery-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(217, 198, 224, 0.3);
+            min-height: 60px;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #007AFF;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .navbar-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #6a4c93;
+        }
+        
+        .navbar-spacer {
+            width: 60px;
+        }
+        
+        /* 内容区域 */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+        
+        /* 当前余额卡片 */
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .balance-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .balance-info {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .balance-info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* 标签切换 */
+        .tab-switch {
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(106, 76, 147, 0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #a991b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3);
+        }
+        
+        /* 套餐卡片 */
+        .package-section {
+            display: none;
+        }
+        
+        .package-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6a4c93;
+            margin-bottom: 15px;
+            padding-left: 5px;
+        }
+        
+        .package-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(106, 76, 147, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .package-card:active {
+            transform: scale(0.98);
+        }
+        
+        .package-card.selected {
+            border-color: #ff6b9d;
+            box-shadow: 0 6px 25px rgba(255, 107, 157, 0.3);
+        }
+        
+        .package-card.recommended {
+            border-color: #ffd700;
+        }
+        
+        .recommend-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #8b4513;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+        
+        .package-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .package-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #6a4c93;
+        }
+        
+        .package-price {
+            display: flex;
+            align-items: baseline;
+            gap: 3px;
+        }
+        
+        .price-symbol {
+            font-size: 18px;
+            color: #ff6b9d;
+            font-weight: bold;
+        }
+        
+        .price-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6b9d;
+        }
+        
+        .package-benefits {
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.1), rgba(254, 207, 239, 0.1));
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6a4c93;
+        }
+        
+        .benefit-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .benefit-icon {
+            font-size: 16px;
+        }
+        
+        /* 立即充值按钮 */
+        .recharge-button {
+            position: sticky;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px 30px;
+            border-top: 1px solid rgba(217, 198, 224, 0.3);
+        }
+        
+        .btn-recharge {
+            width: 100%;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn-recharge:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        }
+        
+        .btn-recharge:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 心动充值输入框 */
+        .custom-recharge {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(106, 76, 147, 0.1);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .amount-input {
+            flex: 1;
+            border: 2px solid rgba(255, 107, 157, 0.3);
+            background: rgba(240, 229, 255, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            color: #6a4c93;
+            font-weight: 600;
+            outline: none;
+            text-align: center;
+        }
+        
+        .amount-input:focus {
+            border-color: #ff6b9d;
+            background: rgba(240, 229, 255, 0.8);
+        }
+        
+        .quick-amount {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .quick-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            background: white;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #6a4c93;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-btn:active {
+            background: rgba(255, 154, 158, 0.1);
+            border-color: #ff6b9d;
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 480px) {
+            .iphone-container {
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-container">
+        <div class="screen">
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="battery-info">
+                    <span>100%</span>
+                    <div style="width: 24px; height: 12px; border: 1px solid #000; border-radius: 2px; position: relative;">
+                        <div style="width: 20px; height: 8px; background: #000; border-radius: 1px; margin: 1px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="navbar">
+                <button class="back-button" onclick="goBack()">← 返回</button>
+                <div class="navbar-title">充值中心</div>
+                <div class="navbar-spacer"></div>
+            </div>
+            
+            <div class="content">
+                <div class="balance-card">
+                    <div class="balance-label">当前心跳值余额</div>
+                    <div class="balance-value" id="currentBalance">0</div>
+                    <div class="balance-info">
+                        <div class="balance-info-item">
+                            <span>💎</span>
+                            <span>VIP会员至 2025-11-11</span>
+                        </div>
+                        <div class="balance-info-item">
+                            <span>👤</span>
+                            <span id="characterCountDisplay">已创建 0 个人物</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-switch">
+                    <button class="tab-button active" onclick="switchTab('vip')">会员套餐</button>
+                    <button class="tab-button" onclick="switchTab('heart')">心动充值</button>
+                </div>
+                
+                <!-- 会员套餐 -->
+                <div class="package-section active" id="vipSection">
+                    <div class="section-title">💎 选择会员套餐</div>
+                    
+                    <div class="package-card" onclick="selectPackage('week')">
+                        <div class="package-header">
+                            <div class="package-name">周度会员</div>
+                            <div class="package-price">
+                                <span class="price-symbol">¥</span>
+                                <span class="price-value">9.9</span>
+                            </div>
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-icon">❤️</span>
+                                <span>1000次心跳值</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">👤</span>
+                                <span>赠送3个人物创建额度</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">⚡</span>
+                                <span>专属VIP标识</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card" onclick="selectPackage('month')">
+                        <div class="package-header">
+                            <div class="package-name">月度会员</div>
+                            <div class="package-price">
+                                <span class="price-symbol">¥</span>
+                                <span class="price-value">19.9</span>
+                            </div>
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-icon">❤️</span>
+                                <span>2500次心跳值</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">👤</span>
+                                <span>赠送7个人物创建额度</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">⚡</span>
+                                <span>专属VIP标识</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">🎁</span>
+                                <span>享受更多特权功能</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 心动充值 -->
+                <div class="package-section" id="heartSection">
+                    <div class="section-title">💰 心动充值</div>
+                    
+                    <div class="package-card" onclick="selectPackage('heart3')">
+                        <div class="package-header">
+                            <div class="package-name">心动充值</div>
+                            <div class="package-price">
+                                <span class="price-symbol">¥</span>
+                                <span class="price-value">3</span>
+                            </div>
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-icon">❤️</span>
+                                <span>200次心跳值</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">👤</span>
+                                <span>赠送1个人物创建额度</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card" onclick="selectPackage('heart6')">
+                        <div class="package-header">
+                            <div class="package-name">心动充值</div>
+                            <div class="package-price">
+                                <span class="price-symbol">¥</span>
+                                <span class="price-value">6</span>
+                            </div>
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-icon">❤️</span>
+                                <span>500次心跳值</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">👤</span>
+                                <span>赠送3个人物创建额度</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card" onclick="selectPackage('heart12')">
+                        <div class="package-header">
+                            <div class="package-name">心动充值</div>
+                            <div class="package-price">
+                                <span class="price-symbol">¥</span>
+                                <span class="price-value">12</span>
+                            </div>
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-icon">❤️</span>
+                                <span>1200次心跳值</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">👤</span>
+                                <span>赠送7个人物创建额度</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recharge-button">
+                <button class="btn-recharge" id="rechargeBtn" onclick="confirmRecharge()">
+                    立即充值
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPackage = null;
+        let currentTab = 'vip';
+        
+        // 检查每日心跳值是否过期（24点清零）
+        function checkDailyHeartExpire() {
+            const lastSignInDate = localStorage.getItem('lastSignInDate');
+            const today = new Date().toDateString();
+            
+            if (lastSignInDate !== today) {
+                // 新的一天，清零每日心跳值
+                localStorage.setItem('dailyHeartBalance', '0');
+            }
+        }
+        
+        // 初始化页面数据
+        function initPageData() {
+            checkDailyHeartExpire();
+            
+            // 从localStorage读取心跳值
+            let heartBalance = localStorage.getItem('heartBalance');
+            if (!heartBalance) {
+                heartBalance = 2350;
+                localStorage.setItem('heartBalance', heartBalance);
+            }
+            
+            let dailyBalance = localStorage.getItem('dailyHeartBalance');
+            if (!dailyBalance) {
+                dailyBalance = 0;
+                localStorage.setItem('dailyHeartBalance', dailyBalance);
+            }
+            
+            const totalBalance = parseInt(heartBalance) + parseInt(dailyBalance);
+            document.getElementById('currentBalance').textContent = totalBalance.toLocaleString();
+            
+            // 从localStorage读取已创建人物列表
+            let characterList = localStorage.getItem('characterList');
+            if (!characterList) {
+                // 默认创建小仙女Alice
+                characterList = JSON.stringify([
+                    {
+                        id: 'alice_001',
+                        name: '小仙女Alice',
+                        avatar: 'A',
+                        createTime: new Date().toISOString()
+                    }
+                ]);
+                localStorage.setItem('characterList', characterList);
+            }
+            const characters = JSON.parse(characterList);
+            const characterCount = characters.length;
+            localStorage.setItem('characterCount', characterCount);
+            document.getElementById('characterCountDisplay').textContent = `已创建 ${characterCount} 个人物`;
+            
+            // 初始化创建额度
+            let createQuota = localStorage.getItem('createQuota');
+            if (!createQuota) {
+                createQuota = 10; // 默认剩余10个创建额度
+                localStorage.setItem('createQuota', createQuota);
+            }
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', function() {
+            initPageData();
+        });
+        
+        // 切换标签
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // 更新标签按钮状态
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 更新显示的内容
+            document.getElementById('vipSection').classList.remove('active');
+            document.getElementById('heartSection').classList.remove('active');
+            
+            if (tab === 'vip') {
+                document.getElementById('vipSection').classList.add('active');
+            } else {
+                document.getElementById('heartSection').classList.add('active');
+            }
+            
+            // 重置选择
+            selectedPackage = null;
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+        
+        // 选择套餐
+        function selectPackage(packageType) {
+            selectedPackage = packageType;
+            
+            // 移除所有选中状态
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 添加选中状态
+            event.currentTarget.classList.add('selected');
+        }
+        
+        // 确认充值
+        function confirmRecharge() {
+            let message = '';
+            let amount = 0;
+            let hearts = 0;
+            let characters = 0;
+            
+            if (!selectedPackage) {
+                alert('请选择一个套餐');
+                return;
+            }
+            
+            if (currentTab === 'vip') {
+                if (selectedPackage === 'week') {
+                    amount = 9.9;
+                    hearts = 1000;
+                    characters = 3;
+                    message = `确认购买周度会员套餐？\n\n价格：¥9.9\n获得：\n• 1000次心跳值\n• 3个人物创建额度\n• 7天VIP会员`;
+                } else if (selectedPackage === 'month') {
+                    amount = 19.9;
+                    hearts = 2500;
+                    characters = 7;
+                    message = `确认购买月度会员套餐？\n\n价格：¥19.9\n获得：\n• 2500次心跳值\n• 7个人物创建额度\n• 30天VIP会员`;
+                }
+            } else {
+                if (selectedPackage === 'heart3') {
+                    amount = 3;
+                    hearts = 200;
+                    characters = 1;
+                    message = `确认充值？\n\n价格：¥3\n获得：\n• 200次心跳值\n• 1个人物创建额度`;
+                } else if (selectedPackage === 'heart6') {
+                    amount = 6;
+                    hearts = 500;
+                    characters = 3;
+                    message = `确认充值？\n\n价格：¥6\n获得：\n• 500次心跳值\n• 3个人物创建额度`;
+                } else if (selectedPackage === 'heart12') {
+                    amount = 12;
+                    hearts = 1200;
+                    characters = 7;
+                    message = `确认充值？\n\n价格：¥12\n获得：\n• 1200次心跳值\n• 7个人物创建额度`;
+                }
+            }
+            
+            if (confirm(message)) {
+                // 更新localStorage中的心跳值
+                let currentBalance = parseInt(localStorage.getItem('heartBalance')) || 0;
+                const newBalance = currentBalance + hearts;
+                localStorage.setItem('heartBalance', newBalance);
+                
+                // 更新localStorage中的人物创建额度（剩余可创建次数）
+                let createQuota = parseInt(localStorage.getItem('createQuota')) || 0;
+                const newQuota = createQuota + characters;
+                localStorage.setItem('createQuota', newQuota);
+                
+                // 更新页面显示（包含每日赠送）
+                const dailyBalance = parseInt(localStorage.getItem('dailyHeartBalance')) || 0;
+                const totalBalance = newBalance + dailyBalance;
+                document.getElementById('currentBalance').textContent = totalBalance.toLocaleString();
+                
+                // 充值成功提示
+                alert('充值成功！\n\n您已获得：\n❤️ ' + hearts + '次心跳值（永久）\n👤 ' + characters + '个人物创建额度\n\n当前总余额：' + totalBalance.toLocaleString() + ' 心跳值\n剩余创建额度：' + newQuota + ' 个');
+                
+                // 2秒后返回个人中心
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 2000);
+            }
+        }
+        
+        // 返回
+        function goBack() {
+            window.location.href = 'profile.html';
+        }
+    </script>
+</body>
+</html>
+

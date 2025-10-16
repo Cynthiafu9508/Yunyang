@@ -205,6 +205,53 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        /* 用户资产展示 */
+        .user-assets {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .asset-item {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.15), rgba(254, 207, 239, 0.15));
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 154, 158, 0.3);
+        }
+        
+        .asset-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b9d;
+            margin-bottom: 4px;
+        }
+        
+        .asset-label {
+            font-size: 12px;
+            color: #a991b8;
+        }
+        
+        .vip-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #8b4513;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        
+        .vip-expire {
+            font-size: 11px;
+            color: #a991b8;
+            margin-top: 4px;
+        }
+        
         /* 功能菜单 */
         .menu-section {
             background: rgba(255, 255, 255, 0.9);
@@ -362,8 +409,11 @@
                             </div>
                             <div class="user-details">
                                 <div class="field-group">
-                                    <div class="field-label">昵称</div>
+                                    <div class="field-label">昵称
+                                        <span class="vip-badge">💎 VIP会员</span>
+                                    </div>
                                     <input type="text" class="field-input" id="nickname" value="梦幻小仙女" onchange="saveNickname()">
+                                    <div class="vip-expire">到期时间：2025-11-11</div>
                                 </div>
                                 <div class="field-group">
                                     <div class="field-label">ID</div>
@@ -374,19 +424,47 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="user-assets">
+                            <div class="asset-item" onclick="goToRecharge()">
+                                <div class="asset-value" id="heartBalance">0</div>
+                                <div class="asset-label">❤️ 心跳值</div>
+                            </div>
+                            <div class="asset-item">
+                                <div class="asset-value" id="characterCount">0</div>
+                                <div class="asset-label">👤 已创建人物</div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="menu-section">
-                        <div class="menu-item" onclick="goToMoments()">
+                        <div class="menu-item" onclick="goToRecharge()">
                             <div class="menu-item-content">
-                                <div class="menu-icon">💕</div>
-                                <div class="menu-text">朋友圈</div>
+                                <div class="menu-icon">💳</div>
+                                <div class="menu-text">订阅充值</div>
                             </div>
                             <div class="menu-arrow">→</div>
                         </div>
                     </div>
                     
                     <div class="menu-section">
+                        <div class="menu-item" onclick="goToMyCharacters()">
+                            <div class="menu-item-content">
+                                <div class="menu-icon">👥</div>
+                                <div class="menu-text">我的人物</div>
+                            </div>
+                            <div class="menu-arrow">→</div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <div class="menu-item" onclick="contactUs()">
+                            <div class="menu-item-content">
+                                <div class="menu-icon">📧</div>
+                                <div class="menu-text">联系我们</div>
+                            </div>
+                            <div class="menu-arrow">→</div>
+                        </div>
                         <div class="menu-item" onclick="openPrivacyPolicy()">
                             <div class="menu-item-content">
                                 <div class="menu-icon">🔒</div>
@@ -427,6 +505,76 @@
     </div>
 
     <script>
+        // 检查并自动赠送每日心跳值
+        function autoGrantDailyHearts() {
+            const lastSignInDate = localStorage.getItem('lastSignInDate');
+            const today = new Date().toDateString();
+            
+            if (lastSignInDate !== today) {
+                // 新的一天，自动赠送50心跳值
+                localStorage.setItem('dailyHeartBalance', '50');
+                localStorage.setItem('lastSignInDate', today);
+                
+                // 延迟弹窗，确保页面加载完成
+                setTimeout(() => {
+                    alert('🎉 每日签到成功！\n\n恭喜您获得50点心跳值\n有效期至今日24:00\n\n快去和小伙伴聊天吧～');
+                }, 500);
+                
+                return true;
+            }
+            return false;
+        }
+        
+        // 初始化用户数据
+        function initUserData() {
+            // 自动赠送每日心跳值（如果是今日首次登录）
+            autoGrantDailyHearts();
+            
+            // 初始化心跳值
+            let heartBalance = localStorage.getItem('heartBalance');
+            if (!heartBalance) {
+                heartBalance = 2350; // 默认心跳值
+                localStorage.setItem('heartBalance', heartBalance);
+            }
+            
+            // 初始化每日赠送心跳值
+            let dailyHeartBalance = localStorage.getItem('dailyHeartBalance');
+            if (!dailyHeartBalance) {
+                dailyHeartBalance = 0;
+                localStorage.setItem('dailyHeartBalance', dailyHeartBalance);
+            }
+            
+            // 显示总心跳值（永久+今日赠送）
+            const totalHeartBalance = parseInt(heartBalance) + parseInt(dailyHeartBalance);
+            document.getElementById('heartBalance').textContent = totalHeartBalance.toLocaleString();
+            
+            // 初始化已创建人物数量（从characterList读取）
+            let characterList = localStorage.getItem('characterList');
+            if (!characterList) {
+                // 默认创建小仙女Alice
+                characterList = JSON.stringify([
+                    {
+                        id: 'alice_001',
+                        name: '小仙女Alice',
+                        avatar: 'A',
+                        createTime: new Date().toISOString()
+                    }
+                ]);
+                localStorage.setItem('characterList', characterList);
+            }
+            const characters = JSON.parse(characterList);
+            const characterCount = characters.length;
+            localStorage.setItem('characterCount', characterCount);
+            document.getElementById('characterCount').textContent = characterCount;
+            
+            // 初始化创建额度（如果没有则设置默认值）
+            let createQuota = localStorage.getItem('createQuota');
+            if (!createQuota) {
+                createQuota = 10; // 默认剩余10个创建额度
+                localStorage.setItem('createQuota', createQuota);
+            }
+        }
+        
         function changeAvatar() {
             alert('更换头像功能');
         }
@@ -458,6 +606,18 @@
             alert('打开使用条款页面');
         }
         
+        function goToRecharge() {
+            window.location.href = 'recharge.html';
+        }
+        
+        function goToMyCharacters() {
+            window.location.href = 'contacts.html';
+        }
+        
+        function contactUs() {
+            alert('联系我们\n\n客服邮箱：support@yunyang.com\n客服微信：yunyang_service\n工作时间：9:00-18:00\n\n我们会尽快回复您的问题！');
+        }
+        
         function logout() {
             if (confirm('确定要退出登录吗？')) {
                 // 清除用户登录状态（如果有本地存储的话）
@@ -469,9 +629,10 @@
             }
         }
         
-        function goToMoments() {
-            window.location.href = 'my-moments.html';
-        }
+        // 页面加载时初始化数据
+        window.addEventListener('load', function() {
+            initUserData();
+        });
     </script>
 </body>
 </html>

@@ -291,54 +291,8 @@
                     <input type="text" class="search-bar" placeholder="搜索联系人...">
                 </div>
                 
-                <div class="contacts-section">
-                    <div class="section-header" id="section-A">A</div>
-                    <ul class="contacts-list">
-                        <li class="contact-item">
-                            <div class="contact-avatar">A</div>
-                            <div class="contact-name">小仙女Alice</div>
-                        </li>
-                        <li class="contact-item">
-                            <div class="contact-avatar">A</div>
-                            <div class="contact-name">天使Anna</div>
-                        </li>
-                    </ul>
-                    
-                    <div class="section-header" id="section-B">B</div>
-                    <ul class="contacts-list">
-                        <li class="contact-item">
-                            <div class="contact-avatar">B</div>
-                            <div class="contact-name">梦幻少女Bella</div>
-                        </li>
-                    </ul>
-                    
-                    <div class="section-header" id="section-C">C</div>
-                    <ul class="contacts-list">
-                        <li class="contact-item">
-                            <div class="contact-avatar">C</div>
-                            <div class="contact-name">粉色公主Coco</div>
-                        </li>
-                        <li class="contact-item">
-                            <div class="contact-avatar">C</div>
-                            <div class="contact-name">可爱Clara</div>
-                        </li>
-                    </ul>
-                    
-                    <div class="section-header" id="section-D">D</div>
-                    <ul class="contacts-list">
-                        <li class="contact-item">
-                            <div class="contact-avatar">D</div>
-                            <div class="contact-name">甜心Diana</div>
-                        </li>
-                    </ul>
-                    
-                    <div class="section-header" id="section-E">E</div>
-                    <ul class="contacts-list">
-                        <li class="contact-item">
-                            <div class="contact-avatar">E</div>
-                            <div class="contact-name">优雅Emma</div>
-                        </li>
-                    </ul>
+                <div class="contacts-section" id="contactsContainer">
+                    <!-- 联系人列表将通过JavaScript动态生成 -->
                 </div>
                 
                 <div class="alphabet-index">
@@ -389,6 +343,93 @@
     </div>
 
     <script>
+        // 初始化已创建人物列表
+        function initCharacterList() {
+            let characters = localStorage.getItem('characterList');
+            if (!characters) {
+                // 默认创建小仙女Alice
+                characters = JSON.stringify([
+                    {
+                        id: 'alice_001',
+                        name: '小仙女Alice',
+                        avatar: 'A',
+                        createTime: new Date().toISOString()
+                    }
+                ]);
+                localStorage.setItem('characterList', characters);
+                localStorage.setItem('characterCount', '1');
+            }
+            
+            // 初始化创建额度
+            let createQuota = localStorage.getItem('createQuota');
+            if (!createQuota) {
+                createQuota = 10; // 默认剩余10个创建额度
+                localStorage.setItem('createQuota', createQuota);
+            }
+            
+            return JSON.parse(characters);
+        }
+        
+        // 渲染联系人列表
+        function renderContacts() {
+            const characters = initCharacterList();
+            const container = document.getElementById('contactsContainer');
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            // 按首字母分组已创建的人物
+            const grouped = {};
+            characters.forEach(char => {
+                const firstLetter = char.avatar.toUpperCase();
+                if (!grouped[firstLetter]) {
+                    grouped[firstLetter] = [];
+                }
+                grouped[firstLetter].push(char);
+            });
+            
+            // 按字母顺序渲染
+            const letters = Object.keys(grouped).sort();
+            letters.forEach(letter => {
+                const section = document.createElement('div');
+                section.innerHTML = `
+                    <div class="section-header" id="section-${letter}">${letter}</div>
+                    <ul class="contacts-list">
+                        ${grouped[letter].map(char => `
+                            <li class="contact-item" onclick="window.location.href='chat.html?character=${char.id}'">
+                                <div class="contact-avatar">${char.avatar}</div>
+                                <div class="contact-name">${char.name}</div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                container.appendChild(section);
+            });
+            
+            // 如果没有已创建的人物，显示提示
+            if (characters.length === 0) {
+                const emptyTip = document.createElement('div');
+                emptyTip.style.cssText = 'padding: 40px 20px; text-align: center; color: #a991b8;';
+                emptyTip.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                    <div style="font-size: 16px; margin-bottom: 10px;">暂无创建的人物</div>
+                    <div style="font-size: 14px; margin-bottom: 20px;">快去创建你的专属虚拟伙伴吧</div>
+                    <button onclick="window.location.href='upload.html'" style="
+                        background: linear-gradient(45deg, #ff9a9e, #fecfef);
+                        color: white;
+                        border: none;
+                        border-radius: 20px;
+                        padding: 12px 30px;
+                        font-size: 15px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+                    ">立即创建</button>
+                `;
+                container.appendChild(emptyTip);
+            }
+        }
+        
         function scrollToSection(letter) {
             const section = document.getElementById('section-' + letter);
             if (section) {
@@ -411,6 +452,11 @@
                 }, 1000);
             }
         }
+        
+        // 页面加载时渲染联系人
+        window.addEventListener('load', function() {
+            renderContacts();
+        });
     </script>
 </body>
 </html>

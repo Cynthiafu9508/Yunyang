@@ -286,12 +286,12 @@
                 </div>
                 
                 <div class="upload-section">
-                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <label for="fileInput" class="upload-area" id="uploadArea">
                         <div class="upload-icon">📷</div>
                         <div class="upload-text">上传照片</div>
                         <div class="upload-hint">点击选择头像照片</div>
                         <img class="preview-image" id="previewImage" alt="预览图片">
-                    </div>
+                    </label>
                     
                     <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="previewFile()">
                     

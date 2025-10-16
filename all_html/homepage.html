@@ -359,10 +359,32 @@
     </div>
 
     <script>
+        // 检查并自动赠送每日心跳值
+        function autoGrantDailyHearts() {
+            const lastSignInDate = localStorage.getItem('lastSignInDate');
+            const today = new Date().toDateString();
+            
+            if (lastSignInDate !== today) {
+                // 新的一天，自动赠送50心跳值
+                localStorage.setItem('dailyHeartBalance', '50');
+                localStorage.setItem('lastSignInDate', today);
+                
+                // 延迟弹窗，确保页面加载完成
+                setTimeout(() => {
+                    alert('🎉 每日签到成功！\n\n恭喜您获得50点心跳值\n有效期至今日24:00\n\n快去和小伙伴聊天吧～');
+                }, 500);
+            }
+        }
+        
         function openChat(userId) {
             // 跳转到聊天详情页面
             window.location.href = 'chat.html';
         }
+        
+        // 页面加载时自动检查并赠送
+        window.addEventListener('load', function() {
+            autoGrantDailyHearts();
+        });
     </script>
 </body>
 </html>
