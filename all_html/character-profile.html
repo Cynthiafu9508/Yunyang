@@ -88,6 +88,16 @@
             font-weight: 600;
         }
         
+        .more-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6a4c93;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            padding: 5px 10px;
+        }
+        
         .back-button {
             background: none;
             border: none;
@@ -527,7 +537,7 @@
                 <div class="navbar">
                     <button class="back-button" onclick="goBack()">← 返回</button>
                     <h1>人物档案</h1>
-                    <div></div>
+                    <button class="more-button" id="moreButton" onclick="showMenu()" style="display: none;">⋯</button>
                 </div>
                 
                 <div class="profile-content">
@@ -677,7 +687,7 @@
                         </div>
                     </div>
                     
-                    <button class="save-button" onclick="createCharacter()">
+                    <button class="save-button" id="actionButton" onclick="handleAction()">
                         ✨ 创建人物
                     </button>
                 </div>
@@ -1102,14 +1112,114 @@
             }
         }
         
-        function createCharacter() {
+        // 页面加载时初始化模式
+        function initPageMode() {
+            const params = getUrlParams();
+            const mode = params.mode;
+            const moreButton = document.getElementById('moreButton');
+            const actionButton = document.getElementById('actionButton');
+            const avatarEditIcon = document.querySelector('.avatar-edit-icon');
+            const allEditIcons = document.querySelectorAll('.edit-icon');
+            
+            if (mode === 'view') {
+                // 只读查看模式 - 完全禁用所有编辑功能
+                moreButton.style.display = 'block'; // 显示⋯菜单
+                actionButton.style.display = 'none'; // 隐藏底部按钮
+                
+                // 禁用所有输入框
+                document.querySelectorAll('.field-input').forEach(input => {
+                    input.readOnly = true;
+                });
+                
+                // 隐藏所有编辑图标
+                allEditIcons.forEach(icon => {
+                    icon.style.display = 'none';
+                });
+                
+                // 禁用头像编辑
+                document.querySelector('.profile-avatar').onclick = null;
+                document.querySelector('.profile-avatar').style.cursor = 'default';
+                if (avatarEditIcon) avatarEditIcon.style.display = 'none';
+                
+                // 禁用所有标签选择按钮
+                document.querySelectorAll('.identity-option').forEach(option => {
+                    option.style.pointerEvents = 'none';
+                    option.style.opacity = '0.6';
+                    option.onclick = null;
+                });
+                
+                // 禁用所有自定义添加按钮
+                document.querySelectorAll('.custom-identity').forEach(button => {
+                    button.style.pointerEvents = 'none';
+                    button.style.opacity = '0.6';
+                    button.onclick = null;
+                });
+                
+                // 隐藏所有标签删除按钮
+                document.querySelectorAll('.tag-delete').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                
+                // 禁用标签点击（不显示详情）
+                document.querySelectorAll('.tag').forEach(tag => {
+                    tag.style.cursor = 'default';
+                    tag.onclick = null;
+                });
+                
+            } else if (mode === 'edit') {
+                // 编辑模式
+                moreButton.style.display = 'none';
+                actionButton.style.display = 'block';
+                actionButton.textContent = '💾 保存修改';
+                actionButton.innerHTML = '💾 保存修改';
+                
+            } else {
+                // 创建模式（默认）
+                moreButton.style.display = 'none';
+                actionButton.style.display = 'block';
+                actionButton.textContent = '✨ 创建人物';
+                actionButton.innerHTML = '✨ 创建人物';
+            }
+        }
+        
+        // 显示菜单（查看模式）
+        function showMenu() {
+            const params = getUrlParams();
+            const options = '请选择操作：\n\n1. ✏️ 编辑人物\n2. 🗑️ 删除好友\n\n输入数字选择：';
+            const choice = prompt(options);
+            
+            if (choice === '1') {
+                // 切换到编辑模式
+                const characterId = params.id || 'alice_001';
+                window.location.href = `character-profile.html?mode=edit&from=${params.from}&id=${characterId}`;
+            } else if (choice === '2') {
+                // 删除好友
+                if (confirm('确定要删除这个好友吗？\n\n删除后将无法恢复，所有聊天记录也将被清空。')) {
+                    alert('好友已删除');
+                    // 实际开发时这里会从localStorage删除该人物
+                    window.location.href = 'contacts.html';
+                }
+            }
+        }
+        
+        // 统一的操作按钮处理
+        function handleAction() {
             const params = getUrlParams();
             
-            // 查看模式下不允许创建，直接返回
-            if (params.mode === 'view') {
-                alert('当前为查看模式，无法修改人物信息');
-                return;
+            if (params.mode === 'edit') {
+                // 保存修改
+                alert('✅ 修改已保存');
+                // 返回查看模式
+                const characterId = params.id || 'alice_001';
+                window.location.href = `character-profile.html?mode=view&from=${params.from}&id=${characterId}`;
+            } else {
+                // 创建人物
+                createCharacter();
             }
+        }
+        
+        function createCharacter() {
+            const params = getUrlParams();
             
             // 根据来源页面跳转到不同页面
             alert('虚拟人物创建成功！');
@@ -1120,6 +1230,11 @@
                 window.location.href = 'homepage.html'; // 默认返回聊天页面
             }
         }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', function() {
+            initPageMode();
+        });
     </script>
 </body>
 </html>
