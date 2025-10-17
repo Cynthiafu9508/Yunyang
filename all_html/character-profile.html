@@ -121,6 +121,7 @@
             flex-direction: column;
             align-items: center;
             margin-bottom: 30px;
+            position: relative;
         }
         
         .profile-avatar {
@@ -135,6 +136,31 @@
             font-size: 48px;
             margin-bottom: 15px;
             box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 154, 158, 0.4);
+        }
+        
+        .avatar-edit-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
         
         .ai-badge {
@@ -506,7 +532,10 @@
                 
                 <div class="profile-content">
                     <div class="profile-header">
-                        <div class="profile-avatar">👩</div>
+                        <div class="profile-avatar" onclick="changeAvatar()">
+                            <span id="avatarDisplay">👩</span>
+                            <div class="avatar-edit-icon">✏️</div>
+                        </div>
                     </div>
                     
                     <div class="profile-fields">
@@ -994,6 +1023,39 @@
                 } else {
                     alert('该初始关系标签已存在！');
                 }
+            }
+        }
+        
+        // 更换头像（不触发AI识别）
+        function changeAvatar() {
+            const emojis = ['👩', '👸', '💁‍♀️', '🧑', '👨', '🤴', '💁‍♂️', '😊', '😎', '🥰', '😇', '🤗', '💖', '✨', '🌟', '💫'];
+            
+            let message = '请选择新头像：\n\n';
+            emojis.forEach((emoji, index) => {
+                message += `${index + 1}. ${emoji}  `;
+                if ((index + 1) % 4 === 0) message += '\n';
+            });
+            message += '\n\n输入数字(1-16)选择，或输入0上传照片';
+            
+            const choice = prompt(message);
+            
+            if (choice === null) return; // 用户取消
+            
+            const index = parseInt(choice);
+            
+            if (index === 0) {
+                // 上传照片功能（模拟）
+                alert('📸 上传照片功能\n\n注意：这里仅更换头像图片，不会调用AI重新识别和生成人设信息。\n\n您当前设定的昵称、性格、说话风格等信息都会保持不变。');
+                // 实际开发时这里会调用文件选择器
+            } else if (index >= 1 && index <= emojis.length) {
+                // 更换为选择的表情
+                const selectedEmoji = emojis[index - 1];
+                document.getElementById('avatarDisplay').textContent = selectedEmoji;
+                
+                // 保存到当前人物数据（实际开发时保存到localStorage）
+                alert('✅ 头像已更换\n\n注意：仅更换了头像，您的人设信息（昵称、性格、说话风格等）保持不变，不会重新生成。');
+            } else {
+                alert('无效选择');
             }
         }
         
