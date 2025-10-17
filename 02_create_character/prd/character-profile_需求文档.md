@@ -70,21 +70,62 @@
 ## ⚙️ 功能需求详述
 
 ### 1. 导航栏功能 (F4.1)
-**需求描述**: 页面导航和标题显示
+**需求描述**: 页面导航和标题显示（支持创建和查看两种模式）
 **优先级**: P0 (必须实现)
 
 **功能细节**:
-- **返回按钮**: "← 返回"按钮，点击返回上传页面
+- **返回按钮**: "← 返回"按钮，根据模式和来源智能返回
 - **页面标题**: 显示"虚拟人物档案"文字
 
+**两种使用场景**:
+
+#### 场景1：创建模式（mode=create）
+**URL格式**: `character-profile.html?mode=create&from=upload`
+**来源**: upload.html上传照片后
+**返回逻辑**: 返回 `upload.html`
+**按钮功能**: "创建人物"可用，保存并创建新人物
+
+#### 场景2：查看模式（mode=view）
+**URL格式**: `character-profile.html?mode=view&from=chat&id=alice_001`
+**来源**: 
+- chat.html点击头像查看人物详情
+- contacts.html点击联系人查看详情
+**返回逻辑**: 
+- from=chat → 返回 `chat.html?character=xxx`
+- from=contacts → 返回 `contacts.html`
+- 其他 → 返回 `homepage.html`
+**按钮功能**: "创建人物"禁用，仅查看不可修改
+
+**智能返回逻辑**:
+```javascript
+返回按钮点击
+    ↓
+检查mode参数
+    ↓
+mode=view（查看模式）
+    ↓ 检查from参数
+from=chat → 返回chat.html?character=xxx
+from=contacts → 返回contacts.html
+其他 → 返回homepage.html
+    ↓
+mode=create（创建模式）
+    ↓
+返回upload.html
+```
+
 **交互规范**:
-- 点击返回按钮跳转至 `upload.html` 页面
-- 返回时清空当前编辑状态
+- 根据URL参数自动判断模式
+- 查看模式下禁用编辑功能
+- 返回时保持上下文连续性
 
 **验收标准**:
-- [ ] 返回按钮功能正常，跳转流畅
-- [ ] 标题文字显示正确
-- [ ] 页面切换无延迟
+- [x] 创建模式下返回上传页面
+- [x] 查看模式下返回来源页面
+- [x] 从chat来的返回chat并传递character参数
+- [x] 从contacts来的返回contacts
+- [x] 返回按钮功能正常，跳转流畅
+- [x] 标题文字显示正确
+- [x] 页面切换无延迟
 
 ### 2. 人物头像展示 (F4.2)
 **需求描述**: 展示用户上传的照片

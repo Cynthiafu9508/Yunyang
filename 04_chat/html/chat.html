@@ -200,6 +200,7 @@
             color: white;
             margin: 0 8px;
             flex-shrink: 0;
+            cursor: pointer;
         }
         
         .message-bubble {
@@ -392,7 +393,7 @@
             </div>
             
             <div class="typing-indicator" id="typingIndicator">
-                <div class="message-avatar">A</div>
+                <div class="message-avatar" onclick="viewCharacterProfile()">A</div>
                 <span>正在输入</span>
                 <div class="typing-dots">
                     <span></span>
@@ -404,7 +405,7 @@
             <div class="chat-messages" id="chatMessages">
                 <!-- 示例消息 -->
                 <div class="message received">
-                    <div class="message-avatar">A</div>
+                    <div class="message-avatar" onclick="viewCharacterProfile()">A</div>
                     <div>
                         <div class="message-bubble">
                             你好呀～今天过得怎么样？有什么开心的事情想和我分享吗？
@@ -423,7 +424,7 @@
                 </div>
                 
                 <div class="message received">
-                    <div class="message-avatar">A</div>
+                    <div class="message-avatar" onclick="viewCharacterProfile()">A</div>
                     <div>
                         <div class="message-bubble">
                             真的吗？那太好了！好天气确实会让人心情变好呢。你今天做了什么特别的事情吗？
@@ -442,7 +443,7 @@
                 </div>
                 
                 <div class="message received">
-                    <div class="message-avatar">A</div>
+                    <div class="message-avatar" onclick="viewCharacterProfile()">A</div>
                     <div>
                         <div class="message-bubble">
                             哇，听起来就很美好！春天的花朵总是能带给人希望和喜悦。你最喜欢什么花呢？
@@ -604,7 +605,7 @@
             
             if (type === 'received') {
                 messageDiv.innerHTML = `
-                    <div class="message-avatar">A</div>
+                    <div class="message-avatar" onclick="viewCharacterProfile()">A</div>
                     <div>
                         <div class="message-bubble">${text}</div>
                         <div class="message-time">${timeString}</div>
@@ -672,7 +673,7 @@
             // 获取当前聊天的人物ID（从URL参数或默认）
             const urlParams = new URLSearchParams(window.location.search);
             const characterId = urlParams.get('character') || 'alice_001';
-            window.location.href = `character-profile.html?id=${characterId}&mode=view`;
+            window.location.href = `character-profile.html?id=${characterId}&mode=view&from=chat`;
         }
         
         // 心跳信息

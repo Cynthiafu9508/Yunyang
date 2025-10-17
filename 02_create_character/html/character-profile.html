@@ -1007,24 +1007,52 @@
             }
         }
         
-        // 获取来源页面参数
-        function getSourcePage() {
+        // 获取URL参数
+        function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('from') || 'homepage'; // 默认返回聊天页面
+            return {
+                mode: urlParams.get('mode') || 'create',        // create创建模式 或 view查看模式
+                from: urlParams.get('from') || 'upload',        // 来源页面
+                id: urlParams.get('id') || null                 // 人物ID（查看模式用）
+            };
         }
         
         function goBack() {
-            // 返回到上传页面
-            const sourcePage = getSourcePage();
-            window.location.href = `upload.html?from=${sourcePage}`;
+            const params = getUrlParams();
+            
+            // 根据模式和来源决定返回目标
+            if (params.mode === 'view') {
+                // 查看模式：返回来源页面
+                if (params.from === 'chat') {
+                    // 从聊天页面来的，返回聊天页面
+                    const characterId = params.id || 'alice_001';
+                    window.location.href = `chat.html?character=${characterId}`;
+                } else if (params.from === 'contacts') {
+                    // 从联系人页面来的，返回联系人页面
+                    window.location.href = 'contacts.html';
+                } else {
+                    // 其他情况返回主页
+                    window.location.href = 'homepage.html';
+                }
+            } else {
+                // 创建模式：返回上传页面
+                window.location.href = `upload.html?from=${params.from}`;
+            }
         }
         
         function createCharacter() {
+            const params = getUrlParams();
+            
+            // 查看模式下不允许创建，直接返回
+            if (params.mode === 'view') {
+                alert('当前为查看模式，无法修改人物信息');
+                return;
+            }
+            
             // 根据来源页面跳转到不同页面
-            const sourcePage = getSourcePage();
             alert('虚拟人物创建成功！');
             
-            if (sourcePage === 'contacts') {
+            if (params.from === 'contacts') {
                 window.location.href = 'contacts.html';
             } else {
                 window.location.href = 'homepage.html'; // 默认返回聊天页面
