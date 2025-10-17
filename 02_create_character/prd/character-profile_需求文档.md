@@ -127,18 +127,193 @@ mode=create（创建模式）
 - [x] 标题文字显示正确
 - [x] 页面切换无延迟
 
-### 2. 人物头像展示 (F4.2)
-**需求描述**: 展示用户上传的照片
+### 2. 人物头像编辑与保存 (F4.2) 🔥重要区分
+**需求描述**: 展示和编辑人物头像（不触发AI重新识别）
 **优先级**: P0 (必须实现)
 
 **功能细节**:
-- **头像显示**: 展示用户在上传页面选择的照片
-- **尺寸规范**: 圆形头像，适配移动端显示
+
+#### 2.1 头像显示
+- **初始显示**: 展示用户在上传页面选择的照片或默认表情符号
+- **圆形裁剪**: 照片自动裁剪为圆形显示
+- **尺寸**: 120px × 120px（移动端100px × 100px）
+- **默认样式**: 粉色渐变背景
+- **位置**: 页面顶部居中
+
+#### 2.2 头像编辑功能
+- **编辑入口**: 点击头像触发编辑
+- **编辑方式**: 
+  - 重新上传照片（从相册选择）
+  - 选择系统预设表情符号（👩👸💁‍♀️等）
+  - 使用默认头像模板
+- **保存逻辑**: 仅更新avatarUrl字段，保存到人物数据
+
+#### 2.3 与AI识别的重要区分 🔥核心业务逻辑
+
+**关键说明**:
+
+**upload.html的AI识别流程**（智能创建人物）:
+```
+用户上传照片
+    ↓
+📸 调用AI视觉识别接口
+    ↓
+分析照片特征（表情、气质、风格）
+    ↓
+🤖 自动生成完整人设信息：
+  - 人物昵称（根据气质）
+  - 出生日期（根据外观年龄）
+  - 职业背景（根据照片风格）
+  - 性格特征（根据表情分析）
+  - 说话风格（根据整体气质）
+  - 初始关系（默认）
+    ↓
+跳转到character-profile.html
+展示AI生成的完整人设
+```
+
+**character-profile.html的头像编辑**（仅更换头像图片）:
+```
+用户在人物档案页点击头像
+    ↓
+弹出照片选择/表情选择界面
+    ↓
+用户选择新照片或表情
+    ↓
+✅ 仅更新头像显示
+❌ 不调用AI识别接口
+❌ 不重新生成人设信息
+❌ 不修改已有的昵称、性格等字段
+    ↓
+仅保存新头像URL到人物数据的avatarUrl字段
+    ↓
+其他所有人设信息保持不变
+```
+
+**核心差异对比表**:
+| 功能维度 | upload.html | character-profile.html |
+|---------|-------------|------------------------|
+| 照片作用 | AI识别源，生成人设 | 仅作为头像显示 |
+| AI识别 | ✅ 必须调用 | ❌ 绝不调用 |
+| 人设生成 | ✅ 自动填充所有字段 | ❌ 保持原有信息不变 |
+| 数据更新 | 生成全部6个字段 | 仅更新avatarUrl |
+| 使用场景 | 首次创建人物 | 已创建人物更换头像 |
+| 用户意图 | 想要AI帮我生成人设 | 只想换个头像图片 |
+
+**业务逻辑说明**:
+
+1. **upload.html的定位**:
+   - 这是"AI智能创建"入口
+   - 用户期望：上传照片→AI识别→自动生成人设
+   - 核心价值：省去用户手动填写人设的麻烦
+   
+2. **character-profile.html的定位**:
+   - 这是"人设编辑"页面
+   - 用户期望：修改人设细节，包括头像
+   - 核心价值：个性化定制，精细调整
+   
+3. **设计初衷**:
+   - 避免用户辛苦编辑的人设被意外覆盖
+   - 例如：用户花了10分钟精心调整性格、说话风格等信息
+   - 如果仅仅想换个头像，结果AI重新识别覆盖了所有设定
+   - 这会导致极差的用户体验
+
+**典型使用场景对比**:
+
+**场景A - 智能创建**（upload.html）:
+```
+用户："我想创建一个虚拟男友，我有他的照片"
+操作：在upload.html上传照片
+期望：AI自动识别并生成完整人设
+结果：✅ AI生成昵称、性格、说话风格等
+```
+
+**场景B - 更换头像**（character-profile.html）:
+```
+用户："我的虚拟男友人设都设好了，但想换个更帅的头像"
+操作：在character-profile.html点击头像，上传新照片
+期望：只换头像，其他信息不变
+结果：✅ 仅更新头像图片，性格、说话风格等保持不变
+```
+
+**技术实现要点**:
+```javascript
+// upload.html - 智能创建流程
+function uploadAndRecognize() {
+    const photo = getSelectedPhoto();
+    
+    // ✅ 调用AI识别API
+    const aiResult = await callAIRecognitionAPI(photo);
+    
+    // ✅ 自动填充所有人设字段
+    const characterData = {
+        avatarUrl: photo,
+        nickname: aiResult.nickname,          // AI生成
+        birthday: aiResult.birthday,          // AI生成
+        occupation: aiResult.occupation,      // AI生成
+        personality: aiResult.personality,    // AI生成
+        speakingStyle: aiResult.speakingStyle,// AI生成
+        initialRelation: '暧昧好友'           // 默认
+    };
+    
+    // 跳转到character-profile.html并传递数据
+    navigateToProfile(characterData);
+}
+
+// character-profile.html - 仅更换头像
+function changeAvatar() {
+    const newPhoto = selectNewPhoto();
+    
+    // ❌ 不调用AI识别API
+    // ❌ 不修改人设字段
+    
+    // ✅ 仅更新头像
+    currentCharacter.avatarUrl = newPhoto;
+    
+    // 保存到localStorage
+    saveCharacterData(currentCharacter);
+    
+    // 更新页面显示
+    updateAvatarDisplay(newPhoto);
+}
+```
+
+**数据结构示例**:
+```javascript
+// 从upload.html创建后的数据
+{
+    id: "char_001",
+    avatarUrl: "photo1.jpg",        // 首次上传的照片
+    nickname: "温柔小哥哥",          // AI识别生成
+    personality: "温柔体贴",         // AI识别生成
+    speakingStyle: "温柔宠溺",       // AI识别生成
+    // ...其他字段
+}
+
+// 在character-profile.html更换头像后
+{
+    id: "char_001",
+    avatarUrl: "photo2.jpg",        // ✅ 已更新为新照片
+    nickname: "温柔小哥哥",          // ❌ 保持不变
+    personality: "温柔体贴",         // ❌ 保持不变
+    speakingStyle: "温柔宠溺",       // ❌ 保持不变
+    // ...其他字段保持不变
+}
+```
 
 **验收标准**:
-- [ ] 头像正确显示用户上传的照片
-- [ ] 图片尺寸和显示效果良好
-- [ ] 异常情况下有合适的默认显示
+- [x] 头像可点击编辑
+- [x] 支持上传新照片
+- [x] 支持选择表情符号或默认头像
+- [x] 更换头像后昵称字段不变
+- [x] 更换头像后性格字段不变
+- [x] 更换头像后说话风格字段不变
+- [x] 更换头像后所有标签保持不变
+- [x] ❌ 确认不调用AI识别接口
+- [x] ❌ 确认不重新生成人设信息
+- [x] 头像保存到人物数据的avatarUrl
+- [x] 照片正确显示
+- [x] 裁剪效果美观
 
 ### 3. AI生成标识 (F4.3)
 **需求描述**: 标识信息来源于AI智能生成
