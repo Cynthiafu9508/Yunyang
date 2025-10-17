@@ -87,7 +87,6 @@ html_prototypes1/
 │   ├── chat.html
 │   ├── profile.html
 │   ├── recharge.html (v2.0新增)
-│   ├── user_flow_diagram.html
 │   └── 功能更新说明_v2.0.md
 │
 ├── README.md                          # 本文件
