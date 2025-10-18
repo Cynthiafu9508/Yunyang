@@ -9,6 +9,9 @@
 
 ## 一、MVP页面层级结构
 
+# 页面层级结构截图：
+https://www.figma.com/design/gbgYS8JrtTfvVyjHR3dvNX/MVP%E9%A1%B5%E9%9D%A2%E5%B1%82%E7%BA%A7?node-id=0-1&t=xzxpBtJlID6v3dfP-1
+
 ```mermaid
 graph TD
     Start([APP启动]) --> Auth{用户状态}
