@@ -31,7 +31,9 @@ graph TD
     
     Tab3 --> Recharge[充值中心<br/>recharge.html<br/>会员/心跳值]
     
-    Login --> Forgot1[找回密码-验证<br/>forgot_password_verify.html]
+    Login --> PasswordLogin[密码登录<br/>password_login.html<br/>手机号+密码]
+    Login --> ForgotMain[找回密码<br/>forgot_password.html<br/>选择找回方式]
+    ForgotMain --> Forgot1[找回密码-验证<br/>forgot_password_verify.html]
     Forgot1 --> Forgot2[找回密码-重置<br/>forgot_password_reset.html]
     
     style Start fill:#e1f5ff,stroke:#333,stroke-width:2px
@@ -46,6 +48,8 @@ graph TD
     style CharCreate fill:#ff9f43,stroke:#333,stroke-width:2px,color:#fff
     style CharView fill:#ff9f43,stroke:#333,stroke-width:2px,color:#fff
     style CharEdit fill:#ff9f43,stroke:#333,stroke-width:2px,color:#fff
+    style PasswordLogin fill:#ff6b6b,stroke:#333,stroke-width:2px,color:#fff
+    style ForgotMain fill:#ff6b6b,stroke:#333,stroke-width:2px,color:#fff
     style Forgot1 fill:#a55eea,stroke:#333,stroke-width:2px,color:#fff
     style Forgot2 fill:#a55eea,stroke:#333,stroke-width:2px,color:#fff
 ```
@@ -59,7 +63,9 @@ graph TD
 | 层级 | 页面名称 | 文件名 | 主要功能 | 导航方式 | 访问权限 |
 |------|---------|--------|---------|---------|---------|
 | **Level 0<br/>认证层** | 登录/注册 | login.html | 手机号登录、验证码验证、自动注册 | 直接访问 | 公开 |
-| | 找回密码-验证 | forgot_password_verify.html | 验证码验证 | 从登录页 | 公开 |
+| | 密码登录 | password_login.html | 手机号+密码登录 | 从登录页 | 公开 |
+| | 找回密码 | forgot_password.html | 选择找回方式 | 从登录页 | 公开 |
+| | 找回密码-验证 | forgot_password_verify.html | 验证码验证 | 从找回密码页 | 公开 |
 | | 找回密码-重置 | forgot_password_reset.html | 重置密码 | 从验证页 | 公开 |
 | **Level 1<br/>主导航层** | 首页 | homepage.html | 人物展示、创建入口、签到 | 底部Tab | 需登录 |
 | | 联系人 | contacts.html | 联系人列表、快速进入聊天 | 底部Tab | 需登录 |
@@ -96,6 +102,10 @@ graph TD
 | 从页面 | 触发操作 | 跳转到 | URL参数 | 是否需要验证 |
 |--------|---------|--------|---------|-------------|
 | login.html | 登录成功 | homepage.html | 无 | - |
+| login.html | 密码登录 | password_login.html | 无 | - |
+| login.html | 找回密码 | forgot_password.html | 无 | - |
+| password_login.html | 登录成功 | homepage.html | 无 | - |
+| forgot_password.html | 验证码找回 | forgot_password_verify.html | 无 | - |
 | homepage.html | 点击+ | upload.html | 无 | ✅ 检查创建额度 |
 | upload.html | 上传照片 | character-profile.html | mode=create&from=upload | ✅ AI识别 |
 | character-profile(create) | 创建成功 | homepage.html | 无 | ✅ 消耗额度 |
@@ -119,7 +129,10 @@ graph TD
 | 页面 | 未登录 | 已登录 | 需要额度 | 需要心跳值 |
 |------|-------|-------|---------|-----------|
 | login.html | ✅ | ✅ | - | - |
-| forgot_password_*.html | ✅ | ✅ | - | - |
+| password_login.html | ✅ | ✅ | - | - |
+| forgot_password.html | ✅ | ✅ | - | - |
+| forgot_password_verify.html | ✅ | ✅ | - | - |
+| forgot_password_reset.html | ✅ | ✅ | - | - |
 | homepage.html | ❌ | ✅ | - | - |
 | contacts.html | ❌ | ✅ | - | - |
 | profile.html | ❌ | ✅ | - | - |
