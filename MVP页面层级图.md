@@ -48,10 +48,10 @@ graph TD
     style CharCreate fill:#ff9f43,stroke:#333,stroke-width:2px,color:#fff
     style CharView fill:#ff9f43,stroke:#333,stroke-width:2px,color:#fff
     style CharEdit fill:#ff9f43,stroke:#333,stroke-width:2px,color:#fff
-    style PasswordLogin fill:#ff6b6b,stroke:#333,stroke-width:2px,color:#fff
-    style ForgotMain fill:#ff6b6b,stroke:#333,stroke-width:2px,color:#fff
-    style Forgot1 fill:#a55eea,stroke:#333,stroke-width:2px,color:#fff
-    style Forgot2 fill:#a55eea,stroke:#333,stroke-width:2px,color:#fff
+    style PasswordLogin fill:#d3d3d3,stroke:#333,stroke-width:2px,color:#333
+    style ForgotMain fill:#d3d3d3,stroke:#333,stroke-width:2px,color:#333
+    style Forgot1 fill:#d3d3d3,stroke:#333,stroke-width:2px,color:#333
+    style Forgot2 fill:#d3d3d3,stroke:#333,stroke-width:2px,color:#333
 ```
 
 ---
