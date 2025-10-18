@@ -31,7 +31,7 @@ graph TD
     
     Tab3 --> Recharge[充值中心<br/>recharge.html<br/>会员/心跳值]
     
-    Login --> PasswordLogin[密码登录<br/>password_login.html<br/>手机号+密码]
+    Login --> PasswordLogin[密码登录<br/>password_login.html<br/>手机号+验证码]
     Login --> ForgotMain[找回密码<br/>forgot_password.html<br/>选择找回方式]
     ForgotMain --> Forgot1[找回密码-验证<br/>forgot_password_verify.html]
     Forgot1 --> Forgot2[找回密码-重置<br/>forgot_password_reset.html]
